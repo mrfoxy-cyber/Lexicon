@@ -11,7 +11,9 @@ Developer course.
 - Prevent duplicate employees with the same personal number and country code.
 - Give one employee multiple simultaneous employment contracts.
 - Store an initial hourly or monthly salary on each contract.
-- Update a contract's salary from a specified date without deleting its history.
+- Append dated salary agreements by contract ID while preserving history.
+- Mark incorrect contracts as invalid and create a replacement contract.
+- End a contract by its ID and close its active salary agreement.
 - Search by name or personal number and list the complete registry.
 - Persist application data in an authenticated encrypted file.
 
@@ -20,12 +22,13 @@ Developer course.
 ```text
 Employee
 └── EmploymentContract (one or more)
-    └── SalaryAgreement (one or more, ordered by effective date)
+    └── SalaryAgreement (the salary recorded when the contract is created)
 ```
 
-Salary belongs to a contract rather than directly to an employee. When a
-salary changes, the previous agreement receives an end date and a new agreement
-is added. `EffectiveTo` is an exclusive end date.
+Salary belongs to a contract rather than directly to an employee. Contract
+details are immutable after creation. If a contract was entered incorrectly,
+mark it `Invalid` and add a corrected replacement contract. `EffectiveTo` is an
+exclusive end date.
 
 New contracts are attached using the employee ID. Salary updates use the
 contract ID. Personal numbers are therefore not used as mutable references for
@@ -54,7 +57,9 @@ Available commands:
 
 - `registeremployee`
 - `addcontract`
-- `updatesalary`
+- `addsalaryagreement`
+- `updatecontractstate`
+- `endcontract`
 - `listemployees`
 - `fetchemployeebyname`
 - `fetchemployeebypersonalnumber`
@@ -74,8 +79,8 @@ dotnet test tests/tests.csproj
 ```
 
 The tests cover persistence, encrypted loading, validation boundaries,
-duplicate prevention, concurrent registration, multiple contracts, and salary
-history.
+duplicate prevention, concurrent registration, multiple contracts, and
+contract-state changes.
 
 ## Original business requirements
 

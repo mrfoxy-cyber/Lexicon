@@ -393,35 +393,40 @@ public sealed class EmployeeRegistryTests : IClassFixture<EmployeeRegistryFixtur
     }
 
     [Fact]
-    public async Task UpdateSalaryAsync_CreatesDatedSalaryHistory()
+    public async Task AddSalaryAgreementAsync_ClosesCurrentAndAddsReplacement()
     {
         string filePath = _fixture.CreateStorageFilePath();
         EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
             filePath,
             Password);
         await registry.RegisterUserAsync(
-            "Salary History",
+            "Salary Change",
             40_000m,
             "2000-01-01",
             "SE",
             ContractStartDate);
         EmploymentContract contract = Assert.Single(
             Assert.Single(registry.GetAllUsers()).Contracts);
-        DateOnly effectiveFrom = contract.StartDate.AddMonths(1);
+        SalaryAgreement originalAgreement = Assert.Single(
+            contract.SalaryAgreements);
+        DateOnly newStartDate = ContractStartDate.AddYears(1);
+        DateOnly newEndDate = newStartDate.AddYears(1);
 
-        Guid agreementId = await registry.UpdateSalaryAsync(
+        Guid agreementId = await registry.AddSalaryAgreementAsync(
             contract.Id,
+            newStartDate,
+            newEndDate,
             42_000m,
-            effectiveFrom);
+            SalaryPeriod.Monthly);
 
-        Assert.Equal(2, contract.SalaryAgreements.Count);
-        SalaryAgreement oldAgreement = contract.SalaryAgreements
-            .Single(agreement => agreement.Id != agreementId);
-        SalaryAgreement newAgreement = contract.SalaryAgreements
-            .Single(agreement => agreement.Id == agreementId);
-        Assert.Equal(effectiveFrom, oldAgreement.EffectiveTo);
+        Assert.Equal(newStartDate, originalAgreement.EffectiveTo);
+        SalaryAgreement newAgreement = Assert.Single(
+            contract.SalaryAgreements,
+            agreement => agreement.Id == agreementId);
         Assert.Equal(42_000m, newAgreement.Amount);
-        Assert.Equal(effectiveFrom, newAgreement.EffectiveFrom);
+        Assert.Equal(SalaryPeriod.Monthly, newAgreement.Period);
+        Assert.Equal(newStartDate, newAgreement.EffectiveFrom);
+        Assert.Equal(newEndDate, newAgreement.EffectiveTo);
 
         EmployeeRegistry reloadedRegistry = await EmployeeRegistry.CreateAsync(
             filePath,
@@ -433,17 +438,207 @@ public sealed class EmployeeRegistryTests : IClassFixture<EmployeeRegistryFixtur
     }
 
     [Fact]
-    public async Task UpdateSalaryAsync_WithUnknownContract_Throws()
+    public async Task AddSalaryAgreementAsync_WithMultipleApplicableAgreements_Throws()
+    {
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            _fixture.CreateStorageFilePath(),
+            Password);
+        await registry.RegisterUserAsync(
+            "Broken Salary Data",
+            40_000m,
+            "2000-01-01",
+            "SE",
+            ContractStartDate);
+        EmploymentContract contract = Assert.Single(
+            Assert.Single(registry.GetAllUsers()).Contracts);
+        contract.SalaryAgreements.Add(new SalaryAgreement
+        {
+            Id = Guid.NewGuid(),
+            Amount = 41_000m,
+            Period = SalaryPeriod.Monthly,
+            EffectiveFrom = ContractStartDate
+        });
+
+        await Assert.ThrowsAsync<MultipleApplicableSalaryAgreementsException>(() =>
+            registry.AddSalaryAgreementAsync(
+                contract.Id,
+                ContractStartDate.AddYears(1),
+                null,
+                42_000m,
+                SalaryPeriod.Monthly));
+
+        Assert.Equal(2, contract.SalaryAgreements.Count);
+    }
+
+    [Fact]
+    public async Task AddSalaryAgreementAsync_WithNoApplicableAgreement_Throws()
+    {
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            _fixture.CreateStorageFilePath(),
+            Password);
+        await registry.RegisterUserAsync(
+            "Salary Gap",
+            40_000m,
+            "2000-01-01",
+            "SE",
+            ContractStartDate);
+        EmploymentContract contract = Assert.Single(
+            Assert.Single(registry.GetAllUsers()).Contracts);
+        Assert.Single(contract.SalaryAgreements).EffectiveTo =
+            ContractStartDate.AddMonths(1);
+
+        await Assert.ThrowsAsync<ApplicableSalaryAgreementNotFoundException>(() =>
+            registry.AddSalaryAgreementAsync(
+                contract.Id,
+                ContractStartDate.AddYears(1),
+                null,
+                42_000m,
+                SalaryPeriod.Monthly));
+    }
+
+    [Fact]
+    public async Task UpdateContractStateAsync_MarksContractInvalidAndPersists()
+    {
+        string filePath = _fixture.CreateStorageFilePath();
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            filePath,
+            Password);
+        await registry.RegisterUserAsync(
+            "Invalid Contract",
+            40_000m,
+            "2000-01-01",
+            "SE",
+            ContractStartDate);
+        EmploymentContract contract = Assert.Single(
+            Assert.Single(registry.GetAllUsers()).Contracts);
+
+        await registry.UpdateContractStateAsync(
+            contract.Id,
+            ContractState.Invalid);
+
+        Assert.Equal(ContractState.Invalid, contract.State);
+        Assert.Single(contract.SalaryAgreements);
+
+        EmployeeRegistry reloadedRegistry = await EmployeeRegistry.CreateAsync(
+            filePath,
+            Password);
+        EmploymentContract reloadedContract = Assert.Single(
+            Assert.Single(reloadedRegistry.GetAllUsers()).Contracts);
+        Assert.Equal(ContractState.Invalid, reloadedContract.State);
+        Assert.Single(reloadedContract.SalaryAgreements);
+    }
+
+    [Fact]
+    public async Task UpdateContractStateAsync_WithUnknownContract_Throws()
     {
         EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
             _fixture.CreateStorageFilePath(),
             Password);
 
         await Assert.ThrowsAsync<ContractNotFoundException>(() =>
-            registry.UpdateSalaryAsync(
+            registry.UpdateContractStateAsync(
                 Guid.NewGuid(),
-                40_000m,
-                new DateOnly(2026, 1, 1)));
+                ContractState.Invalid));
+    }
+
+    [Fact]
+    public async Task EndContractAsync_ById_ClosesContractAndSalaryAgreement()
+    {
+        string filePath = _fixture.CreateStorageFilePath();
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            filePath,
+            Password);
+        await registry.RegisterUserAsync(
+            "Ending Employee",
+            40_000m,
+            "2000-01-01",
+            "SE",
+            ContractStartDate);
+        EmploymentContract contract = Assert.Single(
+            Assert.Single(registry.GetAllUsers()).Contracts);
+        DateOnly endDate = ContractStartDate.AddYears(1);
+
+        await registry.EndContractAsync(contract.Id, endDate);
+
+        Assert.Equal(endDate, contract.EndDate);
+        Assert.Equal(endDate, Assert.Single(
+            contract.SalaryAgreements).EffectiveTo);
+
+        EmployeeRegistry reloadedRegistry = await EmployeeRegistry.CreateAsync(
+            filePath,
+            Password);
+        EmploymentContract reloadedContract = Assert.Single(
+            Assert.Single(reloadedRegistry.GetAllUsers()).Contracts);
+        Assert.Equal(endDate, reloadedContract.EndDate);
+        Assert.Equal(endDate, Assert.Single(
+            reloadedContract.SalaryAgreements).EffectiveTo);
+    }
+
+    [Fact]
+    public async Task EndContractAsync_WithUnknownContract_Throws()
+    {
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            _fixture.CreateStorageFilePath(),
+            Password);
+
+        await Assert.ThrowsAsync<ContractNotFoundException>(() =>
+            registry.EndContractAsync(
+                Guid.NewGuid(),
+                ContractStartDate.AddYears(1)));
+    }
+
+    [Fact]
+    public async Task EndContractAsync_OnStartDate_Throws()
+    {
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            _fixture.CreateStorageFilePath(),
+            Password);
+        await registry.RegisterUserAsync(
+            "Ending Employee",
+            40_000m,
+            "2000-01-01",
+            "SE",
+            ContractStartDate);
+        EmploymentContract contract = Assert.Single(
+            Assert.Single(registry.GetAllUsers()).Contracts);
+
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            registry.EndContractAsync(contract.Id, ContractStartDate));
+
+        Assert.Null(contract.EndDate);
+        Assert.Null(Assert.Single(contract.SalaryAgreements).EffectiveTo);
+    }
+
+    [Fact]
+    public async Task UpdateContractStateAsync_WithDuplicateContractId_ThrowsDataIntegrityError()
+    {
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            _fixture.CreateStorageFilePath(),
+            Password);
+        await registry.RegisterUserAsync(
+            "First Employee",
+            40_000m,
+            "2000-01-01",
+            "SE",
+            ContractStartDate);
+        await registry.RegisterUserAsync(
+            "Second Employee",
+            41_000m,
+            "2001-01-01",
+            "SE",
+            ContractStartDate);
+
+        IReadOnlyList<Employee> employees = registry.GetAllUsers();
+        Guid duplicateId = employees[0].Contracts[0].Id;
+        employees[1].Contracts[0].Id = duplicateId;
+
+        DuplicateContractIdException exception =
+            await Assert.ThrowsAsync<DuplicateContractIdException>(() =>
+                registry.UpdateContractStateAsync(
+                    duplicateId,
+                    ContractState.Invalid));
+
+        Assert.Contains("2 employment contracts", exception.Message);
     }
 
     private static async Task<Exception?> CaptureRegistrationAsync(

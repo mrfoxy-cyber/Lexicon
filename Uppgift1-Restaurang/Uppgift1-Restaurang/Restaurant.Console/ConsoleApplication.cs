@@ -57,8 +57,16 @@ public class ConsoleApplication
                     await AddContractAsync();
                     break;
 
-                case "updatesalary":
-                    await UpdateSalaryAsync();
+                case "addsalaryagreement":
+                    await AddSalaryAgreementAsync();
+                    break;
+
+                case "updatecontractstate":
+                    await UpdateContractStateAsync();
+                    break;
+
+                case "endcontract":
+                    await EndContractAsync();
                     break;
 
                 case "fetchemployeebyname":
@@ -89,7 +97,9 @@ public class ConsoleApplication
         Console.WriteLine("  help - Show this help message.");
         Console.WriteLine("  registeremployee - Register a new employee.");
         Console.WriteLine("  addcontract - Add another employment contract.");
-        Console.WriteLine("  updatesalary - Add a new salary agreement to a contract.");
+        Console.WriteLine("  addsalaryagreement - Add a dated salary agreement.");
+        Console.WriteLine("  updatecontractstate - Mark a contract valid or invalid.");
+        Console.WriteLine("  endcontract - End a contract using its id.");
         Console.WriteLine("  listemployees - List all employees.");
         Console.WriteLine("  fetchemployeebyname - Fetch employee by name.");
         Console.WriteLine("  fetchemployeebypersonalnumber - Fetch employee by personal number.");
@@ -170,24 +180,54 @@ public class ConsoleApplication
         }
     }
 
-    private async Task UpdateSalaryAsync()
+    private async Task AddSalaryAgreementAsync()
     {
         Guid contractId = ReadGuid("Contract id: ");
-        decimal salary = ReadSalary();
-        DateOnly effectiveFrom = ReadDate(
-            "New salary effective from (yyyy-MM-dd): ");
+        decimal amount = ReadSalary();
+        SalaryPeriod salaryPeriod = ReadSalaryPeriod();
+        DateOnly startDate = ReadDate("Salary start date (yyyy-MM-dd): ");
+        DateOnly? endDate = ReadOptionalDate(
+            "Salary end date (yyyy-MM-dd, blank for ongoing): ");
 
         try
         {
-            await Registry.UpdateSalaryAsync(
+            Guid agreementId = await Registry.AddSalaryAgreementAsync(
                 contractId,
-                salary,
-                effectiveFrom);
-            Console.WriteLine("Salary updated.");
+                startDate,
+                endDate,
+                amount,
+                salaryPeriod);
+            Console.WriteLine($"Salary agreement saved. Id: {agreementId}");
+        }
+        catch (Exception exception) when (
+            exception is InvalidOperationException or ArgumentOutOfRangeException)
+        {
+            Console.WriteLine($"Warning: {exception.Message}");
+        }
+        catch (Exception exception) when (
+            exception is IOException or UnauthorizedAccessException)
+        {
+            Console.WriteLine($"Could not save salary agreement: {exception.Message}");
+        }
+    }
+
+    private async Task UpdateContractStateAsync()
+    {
+        Guid contractId = ReadGuid("Contract id: ");
+        ContractState state = ReadContractState();
+
+        try
+        {
+            await Registry.UpdateContractStateAsync(contractId, state);
+            Console.WriteLine($"Contract marked as {state}.");
         }
         catch (ContractNotFoundException exception)
         {
             Console.WriteLine($"Warning: {exception.Message}");
+        }
+        catch (DuplicateContractIdException exception)
+        {
+            Console.WriteLine($"Data error: {exception.Message}");
         }
         catch (ArgumentOutOfRangeException exception)
         {
@@ -196,7 +236,32 @@ public class ConsoleApplication
         catch (Exception exception) when (
             exception is IOException or UnauthorizedAccessException)
         {
-            Console.WriteLine($"Could not update salary: {exception.Message}");
+            Console.WriteLine($"Could not update contract state: {exception.Message}");
+        }
+    }
+
+    private async Task EndContractAsync()
+    {
+        Guid contractId = ReadGuid("Contract id: ");
+        DateOnly endDate = ReadDate("Contract end date (yyyy-MM-dd): ");
+
+        try
+        {
+            await Registry.EndContractAsync(contractId, endDate);
+            Console.WriteLine("Contract ended.");
+        }
+        catch (Exception exception) when (
+            exception is ContractNotFoundException or
+            ContractAlreadyEndedException or
+            DuplicateContractIdException or
+            ArgumentOutOfRangeException)
+        {
+            Console.WriteLine($"Warning: {exception.Message}");
+        }
+        catch (Exception exception) when (
+            exception is IOException or UnauthorizedAccessException)
+        {
+            Console.WriteLine($"Could not end contract: {exception.Message}");
         }
     }
 
@@ -281,6 +346,23 @@ public class ConsoleApplication
         }
     }
 
+    private static ContractState ReadContractState()
+    {
+        while (true)
+        {
+            Console.Write("Contract state (valid/invalid): ");
+            string value = Console.ReadLine()?.Trim() ?? "";
+
+            if (Enum.TryParse(value, ignoreCase: true, out ContractState state) &&
+                Enum.IsDefined(state))
+            {
+                return state;
+            }
+
+            Console.WriteLine("Enter 'valid' or 'invalid'.");
+        }
+    }
+
     private static DateOnly ReadDate(string prompt)
     {
         while (true)
@@ -298,6 +380,30 @@ public class ConsoleApplication
             }
 
             Console.WriteLine("Enter a date using yyyy-MM-dd.");
+        }
+    }
+
+    private static DateOnly? ReadOptionalDate(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            string value = Console.ReadLine()?.Trim() ?? "";
+
+            if (value.Length == 0)
+                return null;
+
+            if (DateOnly.TryParseExact(
+                value,
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out DateOnly date))
+            {
+                return date;
+            }
+
+            Console.WriteLine("Enter a date using yyyy-MM-dd or leave it blank.");
         }
     }
 
@@ -326,6 +432,7 @@ public class ConsoleApplication
             string endDate = contract.EndDate?.ToString("yyyy-MM-dd") ?? "ongoing";
             Console.WriteLine(
                 $"  Contract: {contract.Id} | {contract.Role} | " +
+                $"State: {contract.State} | " +
                 $"{contract.StartDate:yyyy-MM-dd} - {endDate}");
 
             foreach (SalaryAgreement agreement in contract.SalaryAgreements

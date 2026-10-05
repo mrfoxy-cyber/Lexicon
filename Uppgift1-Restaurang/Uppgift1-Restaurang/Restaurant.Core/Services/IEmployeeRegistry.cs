@@ -19,10 +19,16 @@ public interface IEmployeeRegistry
         SalaryPeriod salaryPeriod,
         DateOnly startDate);
 
-    Task<Guid> UpdateSalaryAsync(
+    Task<Guid> AddSalaryAgreementAsync(
         Guid contractId,
-        decimal newAmount,
-        DateOnly effectiveFrom);
+        DateOnly startDate,
+        DateOnly? endDate,
+        decimal amount,
+        SalaryPeriod salaryPeriod);
+
+    Task UpdateContractStateAsync(Guid contractId, ContractState state);
+
+    Task EndContractAsync(Guid contractId, DateOnly endDate);
 
     IReadOnlyList<Employee> GetAllUsers();
     IReadOnlyList<Employee> GetUsersByPersonalNumber(string personalNumber);
@@ -51,6 +57,49 @@ public sealed class ContractNotFoundException : InvalidOperationException
 {
     public ContractNotFoundException(Guid contractId)
         : base($"No employment contract with id '{contractId}' was found.")
+    {
+    }
+}
+
+public sealed class ContractAlreadyEndedException : InvalidOperationException
+{
+    public ContractAlreadyEndedException(Guid contractId)
+        : base($"Employment contract '{contractId}' has already ended.")
+    {
+    }
+}
+
+public sealed class DuplicateContractIdException : InvalidOperationException
+{
+    public DuplicateContractIdException(Guid contractId, int matchCount)
+        : base(
+            $"Data integrity error: {matchCount} employment contracts " +
+            $"have the id '{contractId}'.")
+    {
+    }
+}
+
+public sealed class ApplicableSalaryAgreementNotFoundException : InvalidOperationException
+{
+    public ApplicableSalaryAgreementNotFoundException(
+        Guid contractId,
+        DateOnly date)
+        : base(
+            $"Contract '{contractId}' has no salary agreement applicable " +
+            $"on {date:yyyy-MM-dd}.")
+    {
+    }
+}
+
+public sealed class MultipleApplicableSalaryAgreementsException : InvalidOperationException
+{
+    public MultipleApplicableSalaryAgreementsException(
+        Guid contractId,
+        DateOnly date,
+        int matchCount)
+        : base(
+            $"Data integrity error: contract '{contractId}' has {matchCount} " +
+            $"salary agreements applicable on {date:yyyy-MM-dd}.")
     {
     }
 }
@@ -180,61 +229,109 @@ public sealed class EmployeeRegistry : IEmployeeRegistry
         }
     }
 
-    public async Task<Guid> UpdateSalaryAsync(
+    public async Task<Guid> AddSalaryAgreementAsync(
         Guid contractId,
-        decimal newAmount,
-        DateOnly effectiveFrom)
+        DateOnly startDate,
+        DateOnly? endDate,
+        decimal amount,
+        SalaryPeriod salaryPeriod)
     {
-        ValidateSalary(newAmount, nameof(newAmount));
+        ValidateSalary(amount, nameof(amount));
+
+        if (!Enum.IsDefined(salaryPeriod))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(salaryPeriod),
+                salaryPeriod,
+                null);
+        }
+
+        if (endDate is not null && endDate <= startDate)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(endDate),
+                endDate,
+                "The salary agreement end date must be after its start date.");
+        }
 
         await _writeLock.WaitAsync();
 
         try
         {
-            EmploymentContract contract = _data.Employees
-                .SelectMany(employee => employee.Contracts)
-                .FirstOrDefault(contract => contract.Id == contractId) ??
-                throw new ContractNotFoundException(contractId);
+            EmploymentContract contract = GetUniqueContract(contractId);
 
-            SalaryAgreement currentAgreement = contract.SalaryAgreements
-                .OrderByDescending(agreement => agreement.EffectiveFrom)
-                .First();
-
-            if (effectiveFrom < currentAgreement.EffectiveFrom)
+            if (contract.State != ContractState.Valid)
             {
-                throw new ArgumentOutOfRangeException(
-                    nameof(effectiveFrom),
-                    effectiveFrom,
-                    "A new salary cannot start before the latest salary agreement.");
+                throw new InvalidOperationException(
+                    $"Salary agreements cannot be added to invalid contract '{contractId}'.");
             }
 
-            if (effectiveFrom == currentAgreement.EffectiveFrom)
+            if (startDate < contract.StartDate ||
+                contract.EndDate is not null && startDate >= contract.EndDate)
             {
-                decimal oldAmount = currentAgreement.Amount;
-                currentAgreement.Amount = newAmount;
+                throw new ArgumentOutOfRangeException(
+                    nameof(startDate),
+                    startDate,
+                    "The salary agreement must start within the contract period.");
+            }
 
-                try
-                {
-                    await SaveAsync();
-                }
-                catch
-                {
-                    currentAgreement.Amount = oldAmount;
-                    throw;
-                }
+            if (contract.EndDate is not null &&
+                (endDate is null || endDate > contract.EndDate))
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(endDate),
+                    endDate,
+                    "The salary agreement cannot continue beyond the contract end date.");
+            }
 
-                return currentAgreement.Id;
+            List<SalaryAgreement> applicableAgreements = contract.SalaryAgreements
+                .Where(agreement =>
+                    agreement.EffectiveFrom <= startDate &&
+                    (agreement.EffectiveTo is null ||
+                     startDate < agreement.EffectiveTo))
+                .ToList();
+
+            SalaryAgreement currentAgreement = applicableAgreements.Count switch
+            {
+                0 => throw new ApplicableSalaryAgreementNotFoundException(
+                    contractId,
+                    startDate),
+                1 => applicableAgreements[0],
+                _ => throw new MultipleApplicableSalaryAgreementsException(
+                    contractId,
+                    startDate,
+                    applicableAgreements.Count)
+            };
+
+            if (startDate <= currentAgreement.EffectiveFrom)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(startDate),
+                    startDate,
+                    "A replacement salary agreement must start after the current one.");
+            }
+
+            bool overlapsAnotherAgreement = contract.SalaryAgreements
+                .Where(agreement => agreement != currentAgreement)
+                .Any(agreement =>
+                    (endDate is null || agreement.EffectiveFrom < endDate) &&
+                    (agreement.EffectiveTo is null || startDate < agreement.EffectiveTo));
+
+            if (overlapsAnotherAgreement)
+            {
+                throw new InvalidOperationException(
+                    "The new salary agreement would overlap another agreement.");
             }
 
             DateOnly? oldEndDate = currentAgreement.EffectiveTo;
-            currentAgreement.EffectiveTo = effectiveFrom;
-
+            currentAgreement.EffectiveTo = startDate;
             var newAgreement = new SalaryAgreement
             {
                 Id = Guid.NewGuid(),
-                Amount = newAmount,
-                Period = currentAgreement.Period,
-                EffectiveFrom = effectiveFrom
+                Amount = amount,
+                Period = salaryPeriod,
+                EffectiveFrom = startDate,
+                EffectiveTo = endDate
             };
             contract.SalaryAgreements.Add(newAgreement);
 
@@ -250,6 +347,87 @@ public sealed class EmployeeRegistry : IEmployeeRegistry
             }
 
             return newAgreement.Id;
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    public async Task UpdateContractStateAsync(
+        Guid contractId,
+        ContractState state)
+    {
+        if (!Enum.IsDefined(state))
+            throw new ArgumentOutOfRangeException(nameof(state), state, null);
+
+        await _writeLock.WaitAsync();
+
+        try
+        {
+            EmploymentContract contract = GetUniqueContract(contractId);
+            ContractState oldState = contract.State;
+            contract.State = state;
+
+            try
+            {
+                await SaveAsync();
+            }
+            catch
+            {
+                contract.State = oldState;
+                throw;
+            }
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    public async Task EndContractAsync(Guid contractId, DateOnly endDate)
+    {
+        await _writeLock.WaitAsync();
+
+        try
+        {
+            EmploymentContract contract = GetUniqueContract(contractId);
+
+            if (contract.EndDate is not null)
+                throw new ContractAlreadyEndedException(contractId);
+
+            if (endDate <= contract.StartDate)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(endDate),
+                    endDate,
+                    "The contract end date must be after its start date.");
+            }
+
+            SalaryAgreement activeAgreement = contract.SalaryAgreements
+                .Single(agreement => agreement.EffectiveTo is null);
+
+            if (endDate <= activeAgreement.EffectiveFrom)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(endDate),
+                    endDate,
+                    "The contract cannot end before its active salary agreement starts.");
+            }
+
+            contract.EndDate = endDate;
+            activeAgreement.EffectiveTo = endDate;
+
+            try
+            {
+                await SaveAsync();
+            }
+            catch
+            {
+                contract.EndDate = null;
+                activeAgreement.EffectiveTo = null;
+                throw;
+            }
         }
         finally
         {
@@ -290,6 +468,23 @@ public sealed class EmployeeRegistry : IEmployeeRegistry
             employee.Country.Equals(
                 countryCode,
                 StringComparison.OrdinalIgnoreCase));
+
+    private EmploymentContract GetUniqueContract(Guid contractId)
+    {
+        List<EmploymentContract> matches = _data.Employees
+            .SelectMany(employee => employee.Contracts)
+            .Where(contract => contract.Id == contractId)
+            .ToList();
+
+        return matches.Count switch
+        {
+            0 => throw new ContractNotFoundException(contractId),
+            1 => matches[0],
+            _ => throw new DuplicateContractIdException(
+                contractId,
+                matches.Count)
+        };
+    }
 
     private static EmploymentContract CreateContract(
         string role,
