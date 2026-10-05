@@ -265,11 +265,13 @@ public sealed class EmployeeRegistryTests : IClassFixture<EmployeeRegistryFixtur
         Task<Exception?> firstRegistration = CaptureRegistrationAsync(
             startSignal.Task,
             registry,
-            "First Employee");
+            "First Employee",
+            40_000m);
         Task<Exception?> secondRegistration = CaptureRegistrationAsync(
             startSignal.Task,
             registry,
-            "Second Employee");
+            "Second Employee",
+            40_000m);
 
         startSignal.SetResult(true);
         Exception?[] outcomes = await Task.WhenAll(
@@ -288,10 +290,55 @@ public sealed class EmployeeRegistryTests : IClassFixture<EmployeeRegistryFixtur
         Assert.Single(reloadedRegistry.GetAllUsers());
     }
 
+    [Fact]
+    public async Task RegisterUserAsync_ConcurrentSameEmployeeWithDifferentSalary_OneRegistrationFails()
+    {
+        string filePath = _fixture.CreateStorageFilePath();
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            filePath,
+            Password);
+        var startSignal = new TaskCompletionSource<bool>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        Task<Exception?> firstRegistration = CaptureRegistrationAsync(
+            startSignal.Task,
+            registry,
+            "Same Employee",
+            40_000m);
+        Task<Exception?> secondRegistration = CaptureRegistrationAsync(
+            startSignal.Task,
+            registry,
+            "Same Employee",
+            41_000m);
+
+        startSignal.SetResult(true);
+        Exception?[] outcomes = await Task.WhenAll(
+            firstRegistration,
+            secondRegistration);
+
+        Assert.Single(outcomes, outcome => outcome is null);
+        Exception failedRegistration = Assert.Single(
+            outcomes,
+            outcome => outcome is not null)!;
+        Assert.IsType<DuplicateEmployeeException>(failedRegistration);
+
+        var employee = Assert.Single(registry.GetAllUsers());
+        Assert.Equal("Same Employee", employee.Name);
+        Assert.Contains(employee.Salary, new[] { 40_000m, 41_000m });
+        Assert.Equal("2000-01-01", employee.PersonalNumber);
+        Assert.Equal("SE", employee.Country);
+
+        EmployeeRegistry reloadedRegistry = await EmployeeRegistry.CreateAsync(
+            filePath,
+            Password);
+        Assert.Single(reloadedRegistry.GetAllUsers());
+    }
+
     private static async Task<Exception?> CaptureRegistrationAsync(
         Task startSignal,
         EmployeeRegistry registry,
-        string name)
+        string name,
+        decimal salary)
     {
         await startSignal;
 
@@ -299,7 +346,7 @@ public sealed class EmployeeRegistryTests : IClassFixture<EmployeeRegistryFixtur
         {
             await registry.RegisterUserAsync(
                 name,
-                40_000m,
+                salary,
                 "2000-01-01",
                 "SE");
             return null;
