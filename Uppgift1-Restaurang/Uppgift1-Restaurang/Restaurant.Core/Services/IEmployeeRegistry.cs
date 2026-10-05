@@ -12,8 +12,18 @@ public interface IEmployeeRegistry
         string country);
 
     IReadOnlyList<Employee> GetAllUsers();
-    Employee? GetUserByPersonalNumber(string personalNumber);
+    IReadOnlyList<Employee> GetUsersByPersonalNumber(string personalNumber);
     IReadOnlyList<Employee> GetUsersByName(string name);
+}
+
+public sealed class DuplicateEmployeeException : InvalidOperationException
+{
+    public DuplicateEmployeeException(string personalNumber, string countryCode)
+        : base(
+            $"An employee with personal number '{personalNumber}' " +
+            $"and country code '{countryCode}' is already registered.")
+    {
+    }
 }
 
 public sealed class EmployeeRegistry : IEmployeeRegistry
@@ -21,6 +31,7 @@ public sealed class EmployeeRegistry : IEmployeeRegistry
     private readonly EncryptedAppDataStore _store;
     private readonly string _storagePassword;
     private readonly AppData _data;
+    private readonly SemaphoreSlim _registrationLock = new(1, 1);
 
     private EmployeeRegistry(
         EncryptedAppDataStore store,
@@ -50,38 +61,72 @@ public sealed class EmployeeRegistry : IEmployeeRegistry
         string personalNumber,
         string country)
     {
-        var employee = new Employee
-        {
-            Id = Guid.NewGuid(),
-            Name = name,
-            Salary = salary,
-            PersonalNumber = personalNumber,
-            Country = country
-        };
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(personalNumber);
+        ArgumentException.ThrowIfNullOrWhiteSpace(country);
 
-        _data.Employees.Add(employee);
+        if (salary < 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(salary),
+                salary,
+                "Salary cannot be negative.");
+        }
+
+        await _registrationLock.WaitAsync();
 
         try
         {
-            await _store.SaveAsync(_data, _storagePassword);
-        }
-        catch
-        {
-            // Keep memory and disk consistent if saving fails.
-            _data.Employees.Remove(employee);
-            throw;
-        }
+            bool employeeAlreadyExists = _data.Employees.Any(employee =>
+                employee.PersonalNumber.Equals(
+                    personalNumber,
+                    StringComparison.OrdinalIgnoreCase) &&
+                employee.Country.Equals(
+                    country,
+                    StringComparison.OrdinalIgnoreCase));
 
-        return employee.Id;
+            if (employeeAlreadyExists)
+                throw new DuplicateEmployeeException(personalNumber, country);
+
+            var employee = new Employee
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Salary = salary,
+                PersonalNumber = personalNumber,
+                Country = country
+            };
+
+            _data.Employees.Add(employee);
+
+            try
+            {
+                await _store.SaveAsync(_data, _storagePassword);
+            }
+            catch
+            {
+                // Keep memory and disk consistent if saving fails.
+                _data.Employees.Remove(employee);
+                throw;
+            }
+
+            return employee.Id;
+        }
+        finally
+        {
+            _registrationLock.Release();
+        }
     }
 
     public IReadOnlyList<Employee> GetAllUsers() => _data.Employees;
 
-    public Employee? GetUserByPersonalNumber(string personalNumber) =>
-        _data.Employees.FirstOrDefault(employee =>
-            employee.PersonalNumber.Equals(
+    public IReadOnlyList<Employee> GetUsersByPersonalNumber(
+        string personalNumber) =>
+        _data.Employees
+            .Where(employee => employee.PersonalNumber.Equals(
                 personalNumber,
-                StringComparison.OrdinalIgnoreCase));
+                StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
     public IReadOnlyList<Employee> GetUsersByName(string name) =>
         _data.Employees

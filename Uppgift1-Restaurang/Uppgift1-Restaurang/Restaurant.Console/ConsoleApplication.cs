@@ -89,7 +89,7 @@ public class ConsoleApplication
         string name = ReadRequired("Name: ");
         decimal salary = ReadSalary();
         string personalNumber = ReadRequired("Personal number: ");
-        string country = ReadRequired("Country: ");
+        string country = ReadRequired("Country code: ");
 
         try
         {
@@ -100,6 +100,10 @@ public class ConsoleApplication
                 country);
 
             Console.WriteLine($"Employee saved. Id: {id}");
+        }
+        catch (DuplicateEmployeeException exception)
+        {
+            Console.WriteLine($"Warning: {exception.Message}");
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
@@ -139,15 +143,17 @@ public class ConsoleApplication
     private void FetchEmployeeByPersonalNumber()
     {
         string personalNumber = ReadRequired("Personal number: ");
-        Employee? employee = Registry.GetUserByPersonalNumber(personalNumber);
+        IReadOnlyList<Employee> matches =
+            Registry.GetUsersByPersonalNumber(personalNumber);
 
-        if (employee is null)
+        if (matches.Count == 0)
         {
             Console.WriteLine("No matching employee was found.");
             return;
         }
 
-        PrintEmployee(employee);
+        foreach (Employee employee in matches)
+            PrintEmployee(employee);
     }
 
     private static string ReadRequired(string prompt)
@@ -186,7 +192,7 @@ public class ConsoleApplication
     private static void PrintEmployee(Employee employee) =>
         Console.WriteLine(
             $"{employee.Name} | Salary: {employee.Salary:N2} | " +
-            $"Personal number: {employee.PersonalNumber} | Country: {employee.Country}");
+            $"Personal number: {employee.PersonalNumber} | Country code: {employee.Country}");
 
     private IEmployeeRegistry Registry =>
         _employeeRegistry ?? throw new InvalidOperationException(

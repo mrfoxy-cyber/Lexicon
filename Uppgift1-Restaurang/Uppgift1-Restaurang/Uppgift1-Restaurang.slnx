@@ -7,6 +7,6 @@
     <Project Path="Restaurant.Core/Restaurant.Core.csproj" Id="b2d16479-a2ae-462a-a479-f7038614a51a" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="Uppgift1-Restaurang/Restaurant.Tests.csproj" />
+    <Project Path="tests/tests.csproj" />
   </Folder>
 </Solution>
