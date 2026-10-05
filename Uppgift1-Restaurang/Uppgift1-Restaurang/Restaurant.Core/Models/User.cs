@@ -1,10 +1,8 @@
-﻿namespace Restaurant.Core.Models
+﻿namespace Restaurant.Core.Models;
+
+public sealed class User
 {
-    public class User
-    {
-        public string Name { get; set; }
-        public decimal Salary { get; set; }
-        public string PersonalNumber { get; set; }
-        public string Country { get; set; }
-    }
+    public Guid Id { get; set; }
+    public string Username { get; set; } = "";
+    public string PasswordHash { get; set; } = "";
 }
