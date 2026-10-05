@@ -32,7 +32,7 @@ exclusive end date.
 
 New contracts are attached using the employee ID. Salary updates use the
 contract ID. Personal numbers are therefore not used as mutable references for
-either operation. Run `listemployees` to display both IDs.
+either operation. Run `employees` and `currentsalaries` to display the IDs.
 
 ## Requirements
 
@@ -55,14 +55,16 @@ dotnet run --project Restaurant.Console/Restaurant.Console.csproj
 
 Available commands:
 
-- `registeremployee`
+- `addemployee`
 - `addcontract`
-- `addsalaryagreement`
-- `updatecontractstate`
+- `addsalary`
+- `contractstate`
 - `endcontract`
-- `listemployees`
-- `fetchemployeebyname`
-- `fetchemployeebypersonalnumber`
+- `employees`
+- `employee`
+- `currentsalaries`
+- `findname`
+- `findnumber`
 - `help`
 - `exit`
 

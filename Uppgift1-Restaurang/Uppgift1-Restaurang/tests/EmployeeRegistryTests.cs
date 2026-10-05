@@ -641,6 +641,64 @@ public sealed class EmployeeRegistryTests : IClassFixture<EmployeeRegistryFixtur
         Assert.Contains("2 employment contracts", exception.Message);
     }
 
+    [Fact]
+    public async Task GetEmployeeById_ReturnsCompleteEmployeeRecord()
+    {
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            _fixture.CreateStorageFilePath(),
+            Password);
+        Guid employeeId = await registry.RegisterUserAsync(
+            "Complete Employee",
+            40_000m,
+            "2000-01-01",
+            "SE",
+            ContractStartDate);
+
+        Employee employee = registry.GetEmployeeById(employeeId);
+
+        Assert.Equal("Complete Employee", employee.Name);
+        Assert.Equal("2000-01-01", employee.PersonalNumber);
+        Assert.Equal("SE", employee.Country);
+        Assert.Single(employee.Contracts);
+        Assert.Single(employee.Contracts[0].SalaryAgreements);
+    }
+
+    [Fact]
+    public async Task GetEmployeeById_WithUnknownId_Throws()
+    {
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            _fixture.CreateStorageFilePath(),
+            Password);
+
+        Assert.Throws<EmployeeNotFoundException>(() =>
+            registry.GetEmployeeById(Guid.NewGuid()));
+    }
+
+    [Fact]
+    public async Task GetEmployeeById_WithDuplicateId_ThrowsDataIntegrityError()
+    {
+        EmployeeRegistry registry = await EmployeeRegistry.CreateAsync(
+            _fixture.CreateStorageFilePath(),
+            Password);
+        await registry.RegisterUserAsync(
+            "First Employee",
+            40_000m,
+            "2000-01-01",
+            "SE",
+            ContractStartDate);
+        await registry.RegisterUserAsync(
+            "Second Employee",
+            41_000m,
+            "2001-01-01",
+            "SE",
+            ContractStartDate);
+        IReadOnlyList<Employee> employees = registry.GetAllUsers();
+        employees[1].Id = employees[0].Id;
+
+        Assert.Throws<DuplicateEmployeeIdException>(() =>
+            registry.GetEmployeeById(employees[0].Id));
+    }
+
     private static async Task<Exception?> CaptureRegistrationAsync(
         Task startSignal,
         EmployeeRegistry registry,

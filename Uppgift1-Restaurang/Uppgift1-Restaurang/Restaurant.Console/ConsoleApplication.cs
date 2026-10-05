@@ -45,23 +45,31 @@ public class ConsoleApplication
                     Help();
                     break;
 
-                case "registeremployee":
+                case "addemployee":
                     await RegisterEmployeeAsync();
                     break;
 
-                case "listemployees":
+                case "employees":
                     ListEmployees();
+                    break;
+
+                case "employee":
+                    PrintEmployee();
+                    break;
+
+                case "currentsalaries":
+                    PrintEmployeesCurrentSalaries();
                     break;
 
                 case "addcontract":
                     await AddContractAsync();
                     break;
 
-                case "addsalaryagreement":
+                case "addsalary":
                     await AddSalaryAgreementAsync();
                     break;
 
-                case "updatecontractstate":
+                case "contractstate":
                     await UpdateContractStateAsync();
                     break;
 
@@ -69,11 +77,11 @@ public class ConsoleApplication
                     await EndContractAsync();
                     break;
 
-                case "fetchemployeebyname":
+                case "findname":
                     FetchEmployeeByName();
                     break;
 
-                case "fetchemployeebypersonalnumber":
+                case "findnumber":
                     FetchEmployeeByPersonalNumber();
                     break;
 
@@ -95,14 +103,16 @@ public class ConsoleApplication
     {
         Console.WriteLine("Available commands:");
         Console.WriteLine("  help - Show this help message.");
-        Console.WriteLine("  registeremployee - Register a new employee.");
+        Console.WriteLine("  addemployee - Register a new employee.");
         Console.WriteLine("  addcontract - Add another employment contract.");
-        Console.WriteLine("  addsalaryagreement - Add a dated salary agreement.");
-        Console.WriteLine("  updatecontractstate - Mark a contract valid or invalid.");
+        Console.WriteLine("  addsalary - Add a dated salary agreement.");
+        Console.WriteLine("  contractstate - Mark a contract valid or invalid.");
         Console.WriteLine("  endcontract - End a contract using its id.");
-        Console.WriteLine("  listemployees - List all employees.");
-        Console.WriteLine("  fetchemployeebyname - Fetch employee by name.");
-        Console.WriteLine("  fetchemployeebypersonalnumber - Fetch employee by personal number.");
+        Console.WriteLine("  employees - List all employees.");
+        Console.WriteLine("  employee - Print one employee's complete record.");
+        Console.WriteLine("  currentsalaries - Print current salaries.");
+        Console.WriteLine("  findname - Find employees by name.");
+        Console.WriteLine("  findnumber - Find employees by personal number.");
         Console.WriteLine("  exit - Exit the application.");
     }
 
@@ -147,7 +157,99 @@ public class ConsoleApplication
         }
 
         foreach (Employee employee in employees)
-            PrintEmployee(employee);
+            PrintEmployeeSummary(employee);
+    }
+
+    private void PrintEmployee()
+    {
+        Guid employeeId = ReadGuid("Employee id: ");
+
+        try
+        {
+            PrintEmployeeDetails(Registry.GetEmployeeById(employeeId));
+        }
+        catch (Exception exception) when (
+            exception is EmployeeNotFoundException or DuplicateEmployeeIdException)
+        {
+            Console.WriteLine($"Warning: {exception.Message}");
+        }
+    }
+
+    private void PrintEmployeesCurrentSalaries()
+    {
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        bool printedAnySalary = false;
+        IReadOnlyList<Employee> employees = Registry.GetAllUsers();
+        var employeesMissingCurrentContract = new List<Employee>();
+
+        foreach (Employee employee in employees)
+        {
+            List<(EmploymentContract Contract, SalaryAgreement Agreement)> salaries =
+                [];
+            List<EmploymentContract> currentContracts = employee.Contracts
+                .Where(contract =>
+                    contract.State == ContractState.Valid &&
+                    contract.StartDate <= today &&
+                    (contract.EndDate is null || today < contract.EndDate))
+                .ToList();
+
+            if (currentContracts.Count == 0)
+            {
+                employeesMissingCurrentContract.Add(employee);
+                continue;
+            }
+
+            foreach (EmploymentContract contract in currentContracts)
+            {
+                List<SalaryAgreement> applicableAgreements =
+                    contract.SalaryAgreements
+                        .Where(agreement =>
+                            agreement.EffectiveFrom <= today &&
+                            (agreement.EffectiveTo is null ||
+                             today < agreement.EffectiveTo))
+                        .ToList();
+
+                if (applicableAgreements.Count > 1)
+                {
+                    Console.WriteLine(
+                        $"Data error: contract '{contract.Id}' has " +
+                        $"{applicableAgreements.Count} current salary agreements.");
+                    continue;
+                }
+
+                if (applicableAgreements.Count == 1)
+                    salaries.Add((contract, applicableAgreements[0]));
+            }
+
+            if (salaries.Count == 0)
+                continue;
+
+            PrintEmployeeSummary(employee);
+
+            foreach ((EmploymentContract contract, SalaryAgreement agreement) in salaries)
+            {
+                Console.WriteLine(
+                    $"  Contract: {contract.Id} | Role: {contract.Role} | " +
+                    $"Salary: {agreement.Amount:N2} {agreement.Period}");
+            }
+
+            printedAnySalary = true;
+        }
+
+        if (!printedAnySalary)
+            Console.WriteLine("No current salaries were found.");
+
+        if (employeesMissingCurrentContract.Count > 0)
+        {
+            Console.WriteLine();
+            Console.WriteLine("Employees missing a current contract:");
+
+            foreach (Employee employee in employeesMissingCurrentContract)
+            {
+                PrintEmployeeSummary(employee);
+                Console.WriteLine("  contract missing");
+            }
+        }
     }
 
     private async Task AddContractAsync()
@@ -277,7 +379,7 @@ public class ConsoleApplication
         }
 
         foreach (Employee employee in matches)
-            PrintEmployee(employee);
+            PrintEmployeeSummary(employee);
     }
 
     private void FetchEmployeeByPersonalNumber()
@@ -293,7 +395,7 @@ public class ConsoleApplication
         }
 
         foreach (Employee employee in matches)
-            PrintEmployee(employee);
+            PrintEmployeeSummary(employee);
     }
 
     private static string ReadRequired(string prompt)
@@ -420,28 +522,55 @@ public class ConsoleApplication
         }
     }
 
-    private static void PrintEmployee(Employee employee)
+    private static void PrintEmployeeSummary(Employee employee)
     {
         Console.WriteLine(
-            $"{employee.Name} | Employee id: {employee.Id} | " +
-            $"Personal number: {employee.PersonalNumber} | " +
-            $"Country code: {employee.Country}");
+            $"Employee id: {employee.Id} | Name: {employee.Name} | " +
+            $"Personal number: {employee.PersonalNumber}");
+    }
 
-        foreach (EmploymentContract contract in employee.Contracts)
+    private static void PrintEmployeeDetails(Employee employee)
+    {
+        Console.WriteLine($"Employee id: {employee.Id}");
+        Console.WriteLine($"Name: {employee.Name}");
+        Console.WriteLine($"Personal number: {employee.PersonalNumber}");
+        Console.WriteLine($"Country code: {employee.Country}");
+
+        if (employee.Contracts.Count == 0)
         {
-            string endDate = contract.EndDate?.ToString("yyyy-MM-dd") ?? "ongoing";
+            Console.WriteLine("Contracts: none");
+            return;
+        }
+
+        Console.WriteLine("Contracts:");
+
+        foreach (EmploymentContract contract in employee.Contracts
+            .OrderBy(contract => contract.StartDate))
+        {
+            string contractEnd = contract.EndDate?.ToString("yyyy-MM-dd") ??
+                "ongoing";
+            Console.WriteLine($"  Contract id: {contract.Id}");
+            Console.WriteLine($"  Role: {contract.Role}");
+            Console.WriteLine($"  State: {contract.State}");
             Console.WriteLine(
-                $"  Contract: {contract.Id} | {contract.Role} | " +
-                $"State: {contract.State} | " +
-                $"{contract.StartDate:yyyy-MM-dd} - {endDate}");
+                $"  Period: {contract.StartDate:yyyy-MM-dd} - {contractEnd}");
+
+            if (contract.SalaryAgreements.Count == 0)
+            {
+                Console.WriteLine("    Salary agreements: none");
+                continue;
+            }
+
+            Console.WriteLine("    Salary agreements:");
 
             foreach (SalaryAgreement agreement in contract.SalaryAgreements
-                .OrderBy(item => item.EffectiveFrom))
+                .OrderBy(agreement => agreement.EffectiveFrom))
             {
                 string salaryEnd = agreement.EffectiveTo?.ToString("yyyy-MM-dd") ??
                     "ongoing";
                 Console.WriteLine(
-                    $"    Salary: {agreement.Amount:N2} {agreement.Period} | " +
+                    $"      Id: {agreement.Id} | Amount: {agreement.Amount:N2} | " +
+                    $"Period: {agreement.Period} | " +
                     $"{agreement.EffectiveFrom:yyyy-MM-dd} - {salaryEnd}");
             }
         }

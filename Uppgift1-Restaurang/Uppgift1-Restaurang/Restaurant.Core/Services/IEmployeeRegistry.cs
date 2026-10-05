@@ -31,6 +31,7 @@ public interface IEmployeeRegistry
     Task EndContractAsync(Guid contractId, DateOnly endDate);
 
     IReadOnlyList<Employee> GetAllUsers();
+    Employee GetEmployeeById(Guid employeeId);
     IReadOnlyList<Employee> GetUsersByPersonalNumber(string personalNumber);
     IReadOnlyList<Employee> GetUsersByName(string name);
 }
@@ -41,6 +42,16 @@ public sealed class DuplicateEmployeeException : InvalidOperationException
         : base(
             $"An employee with personal number '{personalNumber}' " +
             $"and country code '{countryCode}' is already registered.")
+    {
+    }
+}
+
+public sealed class DuplicateEmployeeIdException : InvalidOperationException
+{
+    public DuplicateEmployeeIdException(Guid employeeId, int matchCount)
+        : base(
+            $"Data integrity error: {matchCount} employees " +
+            $"have the id '{employeeId}'.")
     {
     }
 }
@@ -436,6 +447,22 @@ public sealed class EmployeeRegistry : IEmployeeRegistry
     }
 
     public IReadOnlyList<Employee> GetAllUsers() => _data.Employees.ToList();
+
+    public Employee GetEmployeeById(Guid employeeId)
+    {
+        List<Employee> matches = _data.Employees
+            .Where(employee => employee.Id == employeeId)
+            .ToList();
+
+        return matches.Count switch
+        {
+            0 => throw new EmployeeNotFoundException(employeeId),
+            1 => matches[0],
+            _ => throw new DuplicateEmployeeIdException(
+                employeeId,
+                matches.Count)
+        };
+    }
 
     public IReadOnlyList<Employee> GetUsersByPersonalNumber(
         string personalNumber)
