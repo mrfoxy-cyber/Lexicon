@@ -16,6 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Restaurant.Console\Restaurant.Console.csproj" />
+    <ProjectReference Include="..\Restaurant.Core\Restaurant.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

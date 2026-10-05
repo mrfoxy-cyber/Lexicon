@@ -1,3 +1,12 @@
 <Solution>
-  <Project Path="Uppgift1-Restaurang/Uppgift1-Restaurang.csproj" />
+  <Folder Name="/Solution Items/">
+    <File Path="ReadMe.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="Restaurant.Console/Restaurant.Console.csproj" Id="8e1b70b3-674e-4e36-8f97-9ba6c3dbd85d" />
+    <Project Path="Restaurant.Core/Restaurant.Core.csproj" Id="b2d16479-a2ae-462a-a479-f7038614a51a" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="Uppgift1-Restaurang/Restaurant.Tests.csproj" />
+  </Folder>
 </Solution>
