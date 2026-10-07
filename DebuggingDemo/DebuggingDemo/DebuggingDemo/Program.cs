@@ -19,7 +19,7 @@ internal class Program
             Console.WriteLine("4. Print Third Word");
 
             Console.Write("Enter your choice: ");
-            SelectionTypeResult choice = RequiredString();
+            InputResult choice = RequiredString();
 
             if (!choice.IsValid)
             {
@@ -70,7 +70,7 @@ internal class Program
     {
         Console.WriteLine("Ticket Price Calculation");
         Console.Write("Enter your age: ");
-        SelectionTypeResult input = RequiredInt();
+        InputResult input = RequiredInt();
 
         if (input.IsValid)
         {
@@ -88,7 +88,7 @@ internal class Program
         Console.WriteLine("Group Ticket Price Calculation");
         Console.WriteLine("How Many People?");
 
-        SelectionTypeResult numberOfPeople = RequiredInt();
+        InputResult numberOfPeople = RequiredInt();
         List<Ticket> tickets = new List<Ticket>();
 
         if (numberOfPeople.IsValid)
@@ -96,7 +96,7 @@ internal class Program
             for (int i = 1; i <= numberOfPeople.Value; i++)
             {
                 Console.Write($"Enter age for person {i}: ");
-                SelectionTypeResult ageInput = RequiredInt();
+                InputResult ageInput = RequiredInt();
 
                 if (ageInput.IsValid)
                 {
@@ -127,7 +127,7 @@ internal class Program
     {
         Console.WriteLine("Enter a sentence:");
 
-        SelectionTypeResult input = RequiredString();
+        InputResult input = RequiredString();
 
         if (input.IsValid)
         {
@@ -168,7 +168,7 @@ internal class Program
         }
     }
 
-    private struct SelectionTypeResult
+    private struct InputResult
     {
         public bool IsValid;
         public string Input;
@@ -176,9 +176,9 @@ internal class Program
         public string ErrorMessage;
     }
 
-    private static SelectionTypeResult RequiredInt()
+    private static InputResult RequiredInt()
     {
-        SelectionTypeResult input = RequiredString();
+        InputResult input = RequiredString();
 
         if (!input.IsValid)
         {
@@ -187,7 +187,7 @@ internal class Program
 
         if (!int.TryParse(input.Input, out int number))
         {
-            return new SelectionTypeResult
+            return new InputResult
             {
                 IsValid = false,
                 Input = input.Input,
@@ -195,7 +195,7 @@ internal class Program
             };
         }
 
-        return new SelectionTypeResult
+        return new InputResult
         {
             IsValid = true,
             Input = input.Input,
@@ -204,13 +204,13 @@ internal class Program
         };
     }
 
-    private static SelectionTypeResult RequiredString()
+    private static InputResult RequiredString()
     {
         string? input = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(input))
         {
-            return new SelectionTypeResult
+            return new InputResult
             {
                 IsValid = false,
                 Input = string.Empty,
@@ -218,7 +218,7 @@ internal class Program
             };
         }
 
-        return new SelectionTypeResult
+        return new InputResult
         {
             IsValid = true,
             Input = input.Trim(),
