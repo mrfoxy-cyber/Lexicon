@@ -61,8 +61,8 @@ internal class Program
         public Ticket(int age)
         {
             Age = age;
-            Price = age < 20 ? 80 : age > 64 ? 90 : 120;
-            TicketType = age < 20 ? "Youth price" : age > 64 ? "Senior citizen price" : "Standard price";
+            Price = (age < 20) && (age >= 5) ? 80 : (age > 64) || (age < 5) ? 0 : 120;
+            TicketType = (age < 20) && (age >= 5) ? "Youth price" : (age > 64) || (age < 5) ? "Free" : "Standard price";
         }
     }
 
