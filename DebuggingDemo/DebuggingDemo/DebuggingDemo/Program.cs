@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -15,8 +17,10 @@ internal class Program
         {
             Console.WriteLine("Menu:");
             Console.WriteLine("0. Exit");
-            Console.WriteLine("1. Option 1");
-            Console.WriteLine("2. Option 2");
+            Console.WriteLine("1. Single Ticket");
+            Console.WriteLine("2. Group Ticket");
+            Console.WriteLine("3. Print Third Word");
+
             Console.Write("Enter your choice: ");
             string choice = Console.ReadLine();
             switch (choice)
@@ -31,6 +35,9 @@ internal class Program
                     break;
                 case "2":
                     GroupTicket();
+                    break;
+                case "3":
+                    PrintThirdWord();
                     break;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");
@@ -109,31 +116,71 @@ internal class Program
         }
     }
 
+    private static void PrintThirdWord()
+    {
+        Console.WriteLine("Enter a sentence:");
+
+        ReadResult input = RequiredString();
+
+        if (input.IsValid)
+        {
+            string[] words = input.Input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (words.Length < 3)
+            {
+                Console.WriteLine("The sentence does not contain a third word.");
+            }
+            else
+            {
+                Console.WriteLine($"The third word is: {words[2]}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Please enter a valid sentence.");
+        }
+    }
+
     struct ReadResult
     {
         public int Value;
+        public string Input;
         public bool IsValid;
     }
 
     private static ReadResult RequiredInt()
     {
-        string input = Console.ReadLine();
 
-        if(string.IsNullOrWhiteSpace(input))
+        ReadResult input = RequiredString();
+
+        if (!input.IsValid)
         {
             Console.WriteLine("Please enter a valid number and try again.");
 
-            return new ReadResult { Value = 0, IsValid = false };
-        }
+            return new ReadResult { IsValid = false };
 
-        if (!int.TryParse(input, out int groupSize))
+        } else if (!int.TryParse(input.Input, out int groupSize))
         {
             Console.WriteLine("Please enter a valid number and try again.");
-            return new ReadResult { Value = 0, IsValid = false };
+            return new ReadResult { IsValid = false };
         }
         else
         {
             return new ReadResult { Value = groupSize, IsValid = true };
+        }
+    }
+
+    private static ReadResult RequiredString()
+    {
+        string input = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            Console.WriteLine("Please enter a valid number and try again.");
+
+            return new ReadResult { IsValid = false };
+        } else
+        {
+            return new ReadResult { Input = input, IsValid = true };
         }
     }
 
