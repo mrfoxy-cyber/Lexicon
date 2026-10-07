@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Documentations/CSharp-Exercise-Control-Flow-Loops-and-String-Manipulation.md" />
+  </Folder>
+  <Project Path="DebuggingDemo/DebuggingDemo.csproj" />
+</Solution>
