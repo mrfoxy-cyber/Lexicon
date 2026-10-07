@@ -15,7 +15,8 @@ internal class Program
             Console.WriteLine("0. Exit");
             Console.WriteLine("1. Single Ticket");
             Console.WriteLine("2. Group Ticket");
-            Console.WriteLine("3. Print Third Word");
+            Console.WriteLine("3. Repeat Me 10 Times");
+            Console.WriteLine("4. Print Third Word");
 
             Console.Write("Enter your choice: ");
             SelectionTypeResult choice = RequiredString();
@@ -40,6 +41,9 @@ internal class Program
                     GroupTicket();
                     break;
                 case "3":
+                    repeatMe10Times();
+                    break;
+                case "4":
                     PrintThirdWord();
                     break;
                 default:
@@ -140,6 +144,27 @@ internal class Program
         else
         {
             ShowError(input.ErrorMessage);
+        }
+    }
+
+    private static void repeatMe10Times()
+    {
+        Console.WriteLine("Enter a sentence to repeat 10 times:");
+
+        var result = RequiredString();
+
+        if (result.IsValid)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Console.Write($"{i + 1}. {result.Input} ");
+            }
+
+            Console.WriteLine();
+        }
+        else
+        {
+            ShowError(result.ErrorMessage);
         }
     }
 
