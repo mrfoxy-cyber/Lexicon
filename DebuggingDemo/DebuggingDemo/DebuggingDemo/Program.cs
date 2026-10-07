@@ -1,15 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Security.Cryptography.X509Certificates;
-using System.Text.RegularExpressions;
-using System.Xml;
 
 namespace DebuggingDemo;
 
 internal class Program
 {
-    private static void Menu(string[] args )
+    private static void Menu()
     {
         bool exit = false;
 
@@ -22,8 +18,15 @@ internal class Program
             Console.WriteLine("3. Print Third Word");
 
             Console.Write("Enter your choice: ");
-            string choice = Console.ReadLine();
-            switch (choice)
+            SelectionTypeResult choice = RequiredString();
+
+            if (!choice.IsValid)
+            {
+                ShowError(choice.ErrorMessage);
+                continue;
+            }
+
+            switch (choice.Input)
             {
                 case "0":
                     Console.WriteLine("You will be exiting the program.");
@@ -55,7 +58,7 @@ internal class Program
         {
             Age = age;
             Price = age < 20 ? 80 : age > 64 ? 90 : 120;
-            TicketType = age < 20 ? "UngdomodmsPris" : age > 64 ? "Pensionärpris" : "Standardpris";
+            TicketType = age < 20 ? "Youth price" : age > 64 ? "Senior citizen price" : "Standard price";
         }
     }
 
@@ -63,7 +66,7 @@ internal class Program
     {
         Console.WriteLine("Ticket Price Calculation");
         Console.Write("Enter your age: ");
-        ReadResult input = RequiredInt();
+        SelectionTypeResult input = RequiredInt();
 
         if (input.IsValid)
         {
@@ -72,7 +75,7 @@ internal class Program
         }
         else
         {
-            Console.WriteLine("Invalid input. Please enter a valid age.");
+            ShowError(input.ErrorMessage);
         }
     }
 
@@ -81,7 +84,7 @@ internal class Program
         Console.WriteLine("Group Ticket Price Calculation");
         Console.WriteLine("How Many People?");
 
-        ReadResult numberOfPeople = RequiredInt();
+        SelectionTypeResult numberOfPeople = RequiredInt();
         List<Ticket> tickets = new List<Ticket>();
 
         if (numberOfPeople.IsValid)
@@ -89,7 +92,7 @@ internal class Program
             for (int i = 1; i <= numberOfPeople.Value; i++)
             {
                 Console.Write($"Enter age for person {i}: ");
-                ReadResult ageInput = RequiredInt();
+                SelectionTypeResult ageInput = RequiredInt();
 
                 if (ageInput.IsValid)
                 {
@@ -98,7 +101,7 @@ internal class Program
                 }
                 else
                 {
-                    Console.WriteLine($"Invalid input for person {i}. Please enter a valid age.");
+                    ShowError($"Person {i}: {ageInput.ErrorMessage}");
                     i--; // Decrement to repeat the iteration for the same person
                 }
             }
@@ -112,7 +115,7 @@ internal class Program
         }
         else
         {
-            Console.WriteLine("Invalid input. Please enter a valid number.");
+            ShowError(numberOfPeople.ErrorMessage);
         }
     }
 
@@ -120,7 +123,7 @@ internal class Program
     {
         Console.WriteLine("Enter a sentence:");
 
-        ReadResult input = RequiredString();
+        SelectionTypeResult input = RequiredString();
 
         if (input.IsValid)
         {
@@ -136,58 +139,78 @@ internal class Program
         }
         else
         {
-            Console.WriteLine("Please enter a valid sentence.");
+            ShowError(input.ErrorMessage);
         }
     }
 
-    struct ReadResult
+    private struct SelectionTypeResult
     {
-        public int Value;
-        public string Input;
         public bool IsValid;
+        public string Input;
+        public int Value;
+        public string ErrorMessage;
     }
 
-    private static ReadResult RequiredInt()
+    private static SelectionTypeResult RequiredInt()
     {
-
-        ReadResult input = RequiredString();
+        SelectionTypeResult input = RequiredString();
 
         if (!input.IsValid)
         {
-            Console.WriteLine("Please enter a valid number and try again.");
-
-            return new ReadResult { IsValid = false };
-
-        } else if (!int.TryParse(input.Input, out int groupSize))
-        {
-            Console.WriteLine("Please enter a valid number and try again.");
-            return new ReadResult { IsValid = false };
+            return input;
         }
-        else
+
+        if (!int.TryParse(input.Input, out int number))
         {
-            return new ReadResult { Value = groupSize, IsValid = true };
+            return new SelectionTypeResult
+            {
+                IsValid = false,
+                Input = input.Input,
+                ErrorMessage = "Please enter a valid whole number."
+            };
         }
+
+        return new SelectionTypeResult
+        {
+            IsValid = true,
+            Input = input.Input,
+            Value = number,
+            ErrorMessage = string.Empty
+        };
     }
 
-    private static ReadResult RequiredString()
+    private static SelectionTypeResult RequiredString()
     {
-        string input = Console.ReadLine();
+        string? input = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(input))
         {
-            Console.WriteLine("Please enter a valid number and try again.");
-
-            return new ReadResult { IsValid = false };
-        } else
-        {
-            return new ReadResult { Input = input, IsValid = true };
+            return new SelectionTypeResult
+            {
+                IsValid = false,
+                Input = string.Empty,
+                ErrorMessage = "Input cannot be empty. Please try again."
+            };
         }
+
+        return new SelectionTypeResult
+        {
+            IsValid = true,
+            Input = input.Trim(),
+            ErrorMessage = string.Empty
+        };
     }
 
-
+    private static void ShowError(string message)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"Error: {message}");
+        Console.ResetColor();
+    }
 
     private static void Main(string[] args)
     {
-        Menu(args);
+        Menu();
     }
 }
+
