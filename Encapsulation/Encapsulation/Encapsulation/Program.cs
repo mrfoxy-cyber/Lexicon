@@ -1,5 +1,9 @@
 ﻿using Encapsulation.Domain;
 
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Encapsulation.Tests")]
+
 class Program
 {
 
