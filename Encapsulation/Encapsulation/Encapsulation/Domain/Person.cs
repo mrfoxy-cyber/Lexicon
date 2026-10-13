@@ -12,7 +12,7 @@ namespace Encapsulation.Domain
 
         private decimal? salary;
 
-        public ArgumentException ArgumentException { get; private set; } = null;
+        public ArgumentException ArgumentException { get; private set; }
 
         public decimal? IncreaseSalary(int percentage)
         {
@@ -108,7 +108,7 @@ namespace Encapsulation.Domain
         {
             if (this.ArgumentException != null)
             {
-                return this.ArgumentException.Message;
+                throw this.ArgumentException;
             }
             return $"{firstName} {lastName} received a {salary} dollars";
         }

@@ -7,10 +7,8 @@ using System.Runtime.CompilerServices;
 class Program
 {
 
-    public static void Main()
+    public static void Run()
     {
-
-
         var lines = int.Parse(Console.ReadLine());
         var persons = new List<Person>();
         for (int i = 0; i < lines; i++)
@@ -26,6 +24,19 @@ class Program
         var bonus = decimal.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
         persons.ForEach(p => p.IncreaseSalary(bonus));
         persons.ForEach(p => Console.WriteLine(p.ToString()));
+    }
+
+    public static void Main()
+    {
+
+        try
+        {
+            Program.Run();
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
 
 
 
