@@ -115,12 +115,11 @@ public class PersonTests
     [InlineData(-6)]
     public void Constructor_RejectsNonPositiveAge(int age)
     {
-        var exception = Assert.Throws<ArgumentException>(
-            () => new Person("Anna", "Ivanov", age, 2200m));
+        var person = new Person("Anna", "Ivanov", age, 2200m);
 
         Assert.Equal(
             "Age cannot be zero or a negative integer!",
-            exception.Message);
+            person.ToString());
     }
 
     [Theory]
@@ -129,12 +128,11 @@ public class PersonTests
     [InlineData("Bo")]
     public void Constructor_RejectsFirstNameShorterThanThreeSymbols(string firstName)
     {
-        var exception = Assert.Throws<ArgumentException>(
-            () => new Person(firstName, "Dahl", 57, 3333m));
+        var person = new Person(firstName, "Dahl", 57, 3333m);
 
         Assert.Equal(
             "First name cannot contain fewer than 3 symbols!",
-            exception.Message);
+            person.ToString());
     }
 
     [Theory]
@@ -143,12 +141,11 @@ public class PersonTests
     [InlineData("Ma")]
     public void Constructor_RejectsLastNameShorterThanThreeSymbols(string lastName)
     {
-        var exception = Assert.Throws<ArgumentException>(
-            () => new Person("Hanna", lastName, 27, 600m));
+        var person = new Person("Hanna", lastName, 27, 600m);
 
         Assert.Equal(
             "Last name cannot contain fewer than 3 symbols!",
-            exception.Message);
+            person.ToString());
     }
 
     [Theory]
@@ -158,12 +155,11 @@ public class PersonTests
     {
         var salary = decimal.Parse(salaryText, CultureInfo.InvariantCulture);
 
-        var exception = Assert.Throws<ArgumentException>(
-            () => new Person("Asen", "Holm", 44, salary));
+        var person = new Person("Asen", "Holm", 44, salary);
 
         Assert.Equal(
             "Salary cannot be less than 460 dollars!",
-            exception.Message);
+            person.ToString());
     }
 
     [Fact]

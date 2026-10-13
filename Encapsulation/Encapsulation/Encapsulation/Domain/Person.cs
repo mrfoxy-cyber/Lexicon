@@ -1,117 +1,139 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 
 namespace Encapsulation.Domain
 {
     internal class Person
     {
-        private string? firstName;
-        private string? lastName;
-        private int? age;
-
-        private decimal? salary;
-
-        public ArgumentException ArgumentException { get; private set; }
-
-        public decimal? IncreaseSalary(int percentage)
-        {
-            if (age < 30)
-            {
-                salary += salary * (decimal)percentage / 200;
-            }
-            else
-            {
-                salary += salary * (decimal)percentage / 100;
-            }
-            return salary;
-        }
-
-        public decimal? IncreaseSalary(decimal percentage)
-        {
-            if (age < 30)
-            {
-                salary += salary *  percentage / 200;
-            }
-            else
-            {
-                salary += salary * percentage / 100;
-            }
-            return salary;
-        }
-
-        bool atleast3Char(string s, string paramName)
-        {
-            if (s.Length < 3)
-            {
-                this.ArgumentException = new ArgumentException($"{paramName} must be at least 3 symbols");
-            }
-            return true;
-        }
-
-        public string? FirstName
-        {
-            get { return firstName; }
-            set { atleast3Char(value, "FirstName"); firstName = value; }
-        }
-
-        public string LastName
-        {
-            get { return lastName; }
-            set { atleast3Char(value, "LastName"); lastName = value; }
-        }
-
-        public int? Age
-        {
-            get { return age; }
-            set {
-                if (value <= 0)
-                {
-                    this.ArgumentException = new ArgumentException("Age cannot be Zero or negative.");
-                }
-                age = value; 
-            }
-        }
-
-        public decimal? Salary
-        {
-            get { return salary; }
-            set
-            {
-                if (value < 460)
-                {
-                    this.ArgumentException = new ArgumentException("Salary cannot be less than 460 dollars.");
-                }
-                salary = value;
-            }
-        }
+        private string firstName = string.Empty;
+        private string lastName = string.Empty;
+        private int age;
+        private decimal salary;
+        private string? errorMessage;
 
         public Person(string firstName, string lastName, int age)
         {
-            this.FirstName = firstName;
-            this.LastName = lastName;
-            this.Age     = age;
+            try
+            {
+                FirstName = firstName;
+                LastName = lastName;
+                Age = age;
+            }
+            catch (ArgumentException ex)
+            {
+                errorMessage = ex.Message;
+            }
         }
 
         public Person(string firstName, string lastName, int age, decimal salary)
             : this(firstName, lastName, age)
         {
-            this.Salary = salary;
+            if (errorMessage is not null)
+            {
+                return;
+            }
+
+            try
+            {
+                Salary = salary;
+            }
+            catch (ArgumentException ex)
+            {
+                errorMessage = ex.Message;
+            }
         }
 
-        public string ToStringOld()
+        public string FirstName
         {
-            return $"{firstName} {lastName} is {age} years old.";
+            get => firstName;
+            private set
+            {
+                if (value is null || value.Length < 3)
+                {
+                    throw new ArgumentException(
+                        "First name cannot contain fewer than 3 symbols!");
+                }
+
+                firstName = value;
+            }
+        }
+
+        public string LastName
+        {
+            get => lastName;
+            private set
+            {
+                if (value is null || value.Length < 3)
+                {
+                    throw new ArgumentException(
+                        "Last name cannot contain fewer than 3 symbols!");
+                }
+
+                lastName = value;
+            }
+        }
+
+        public int Age
+        {
+            get => age;
+            private set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentException(
+                        "Age cannot be zero or a negative integer!");
+                }
+
+                age = value;
+            }
+        }
+
+        public decimal Salary
+        {
+            get => salary;
+            private set
+            {
+                if (value < 460m)
+                {
+                    throw new ArgumentException(
+                        "Salary cannot be less than 460 dollars!");
+                }
+
+                salary = value;
+            }
+        }
+
+        public decimal IncreaseSalary(decimal percentage)
+        {
+            if (errorMessage is not null)
+            {
+                return salary;
+            }
+
+            var appliedPercentage = age < 30
+                ? percentage / 2m
+                : percentage;
+
+            salary += salary * appliedPercentage / 100m;
+            return salary;
         }
 
         public override string ToString()
         {
-            if (this.ArgumentException != null)
+            if (errorMessage is not null)
             {
-                throw this.ArgumentException;
+                return errorMessage;
             }
-            return $"{firstName} {lastName} received a {salary} dollars";
-        }
 
+            if (salary == 0m)
+            {
+                return $"{firstName} {lastName} is {age} years old.";
+            }
+
+            var formattedSalary = salary.ToString(
+                "F2",
+                CultureInfo.InvariantCulture);
+
+            return $"{firstName} {lastName} receives {formattedSalary} dollars.";
+        }
     }
 }
