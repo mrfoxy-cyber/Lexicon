@@ -5,7 +5,7 @@ namespace Garage
 {
     internal class Garage<T> where T : Garage.Vehicle.Vehicle
     {
-        private readonly T[] vehicles;
+        private readonly T?[] vehicles;
 
         public Garage(int capacity)
         {
