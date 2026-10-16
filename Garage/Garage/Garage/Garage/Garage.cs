@@ -7,8 +7,31 @@ namespace Garage
     {
         private readonly T[] vehicles;
 
-        public void Park(T vehicle) => vehicles.Add(vehicle);
+        public Garage(int capacity)
+        {
+            vehicles = new T?[capacity];
+        }
 
-        public IReadOnlyCollection<T> Vehicles => vehicles;
+        public ParkResult Park(T vehicle)
+        {
+            int openSpot = Array.FindIndex(vehicles, spot => spot is null);
+
+            if (openSpot == -1)
+            {
+                return new ParkResult(false, null, "The garage is full");
+            }
+            else
+            {
+                vehicles[openSpot] = vehicle;
+
+                return new ParkResult(true, openSpot, "Parked the car in sport " + (openSpot));
+            }
+
+        }
+
+
+        public IEnumerable<T> Vehicles =>
+            vehicles.Where(vehicle => vehicle is not null)!;
     }
+
 }
