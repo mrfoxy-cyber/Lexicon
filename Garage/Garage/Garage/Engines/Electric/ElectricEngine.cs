@@ -1,4 +1,6 @@
-namespace Garage.Engines;
+using Garage.Engines;
+
+namespace Garage.Engines.Electric;
 
 public abstract class ElectricEngine : Engine
 {

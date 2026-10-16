@@ -1,4 +1,4 @@
-namespace Garage.Engines;
+namespace Garage.Engines.ExternalCombustion;
 
 public class SteamEngine : ExternalCombustionEngine
 {

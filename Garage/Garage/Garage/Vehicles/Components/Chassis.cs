@@ -2,21 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using Garage.Vehicles.Types;
 
-namespace Garage.Vehicle
+namespace Garage.Vehicles.Components
 {
 
-    public enum BodyType
-    {
-        Sedan,
-        Hatchback,
-        SUV,
-        Coupe,
-        Convertible,
-        Van,
-        Pickup,
-        Motorcycle
-    }
     public class Chassis
     {
         public required string Vin { get; init; }

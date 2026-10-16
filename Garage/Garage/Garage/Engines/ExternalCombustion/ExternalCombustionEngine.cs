@@ -1,4 +1,6 @@
-namespace Garage.Engines;
+using Garage.Engines;
+
+namespace Garage.Engines.ExternalCombustion;
 
 public abstract class ExternalCombustionEngine : Engine
 {

@@ -1,4 +1,4 @@
-namespace Garage.Engines;
+namespace Garage.Engines.InternalCombustion.Turbine;
 
 public class TurbopropEngine : TurbineEngine
 {

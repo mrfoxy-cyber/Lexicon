@@ -1,4 +1,6 @@
-namespace Garage.Engines;
+using Garage.Engines.InternalCombustion;
+
+namespace Garage.Engines.InternalCombustion.Turbine;
 
 public abstract class TurbineEngine : InternalCombustionEngine
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Garage.Vehicle
+namespace Garage.Vehicles.Components
 {
     public class Cockpit
     {

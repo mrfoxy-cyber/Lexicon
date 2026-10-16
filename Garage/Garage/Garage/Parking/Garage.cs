@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-namespace Garage
+namespace Garage.Parking
 {
-    internal class Garage<T> where T : Garage.Vehicle.Vehicle
+    internal class Garage<T> where T : Garage.Vehicles.Vehicle
     {
         private readonly T?[] vehicles;
 

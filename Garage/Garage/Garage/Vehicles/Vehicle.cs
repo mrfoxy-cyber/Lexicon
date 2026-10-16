@@ -2,8 +2,9 @@ using Garage.Engines;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Garage.Vehicles.Types;
 
-namespace Garage.Vehicle
+namespace Garage.Vehicles
 {
 
     public abstract class Vehicle
@@ -15,7 +16,7 @@ namespace Garage.Vehicle
         public int ManufacturingYear { get; init; }
         public VehicleColor Color { get; set; }
         public double WeightKg { get; init; }
-        public List<Garage.Engines.Engine> Engines { get; init; } = [];
+        public List<Engine> Engines { get; init; } = [];
 
         public int NumberOfWheels { get; init; }
 

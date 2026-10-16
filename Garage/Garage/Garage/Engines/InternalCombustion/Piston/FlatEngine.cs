@@ -1,4 +1,4 @@
-namespace Garage.Engines;
+namespace Garage.Engines.InternalCombustion.Piston;
 
 public class FlatEngine : PistonEngine
 {
