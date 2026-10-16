@@ -17,7 +17,9 @@ namespace Garage.Vehicle
         public double WeightKg { get; init; }
         public List<Garage.Engines.Engine> Engines { get; init; } = [];
 
-        public double Length { get; init}
+        public int NumberOfWheels { get; init; }
+
+        public double Length { get; init; }
 
         public double width { get; init; }
         public double height { get; init; }
