@@ -42,18 +42,14 @@ public static class AirplaneFactory
             ManufacturingYear = manufacturingYear,
             Color = color,
             WeightKg = weightKg,
+            Dimensions = new Dimensions(lengthMeters, wingspanMeters, heightMeters),
             NumberOfWheels = numberOfWheels,
-            Length = lengthMeters,
-            width = wingspanMeters,
-            height = heightMeters,
 
-            PassengerCapacity = passengerSeatCount,
             MaximumAltitudeMeters = maximumAltitudeMeters,
 
             Airframe = new Airframe
             {
                 SerialNumber = airframeSerialNumber,
-                LengthMeters = lengthMeters,
                 WingspanMeters = wingspanMeters,
                 Cockpit = cockpit
             },

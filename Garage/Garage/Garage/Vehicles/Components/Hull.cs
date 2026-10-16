@@ -4,7 +4,9 @@ using System.Text;
 
 namespace Garage.Vehicles.Components
 {
-    internal class Hull
+    public class Hull
     {
+        public required string IdentificationNumber { get; init; }
+        public double DraftMeters { get; init; }
     }
 }

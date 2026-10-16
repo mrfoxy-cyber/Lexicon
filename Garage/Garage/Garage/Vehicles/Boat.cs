@@ -7,13 +7,14 @@ using Garage.Vehicles.Types;
 
 namespace Garage.Vehicles
 {
-    internal class Boat: Garage.Vehicles.Vehicle, IPassengerCarrier
+    public class Boat : Vehicle, IPassengerCarrier
     {
         public required Hull Hull { get; init; }
+        public Cabin? Cabin { get; init; }
 
         public BoatType BoatType { get; init; }
         public int PassengerCapacity { get; init; }
-        public bool HasCabin { get; init; }
+        public bool HasCabin => Cabin is not null;
 
         public int DriverSeats { get; init; }
     }

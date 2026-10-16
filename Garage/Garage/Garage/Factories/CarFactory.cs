@@ -31,25 +31,15 @@ public static class CarFactory
             ManufacturingYear = manufacturingYear,
             Color = color,
             WeightKg = weightKg,
+            Dimensions = new Dimensions(length, width, height),
             NumberOfWheels = 4,
-            Length = length,
-            width = width,
-            height = height,
 
+            BodyType = bodyType,
             NumberOfDoors = numberOfDoors,
-            NumberOfSeats = numberOfSeats,
 
             Chassis = new Chassis
             {
-                Vin = vin,
-                Manufacturer = manufacturer,
-                Model = model,
-                ManufacturingYear = manufacturingYear,
-                Color = color,
-                BodyType = bodyType,
-                NumberOfDoors = numberOfDoors,
-                NumberOfSeats = numberOfSeats,
-                WeightKg = weightKg
+                Vin = vin
             },
 
             Cabin = new Cabin
