@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vehicle;
-
 namespace Garage
 {
-    internal class Garage<T> where T : Vehicle.Vehicle
+    internal class Garage<T> where T : Garage.Vehicle.Vehicle
     {
         private readonly List<T> vehicles = [];
 

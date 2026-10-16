@@ -15,6 +15,8 @@ namespace Garage.Engines
         AviationGasoline,
         JetFuel,
         Kerosene,
-        Biofuel
+        Biofuel,
+        Coal,
+        Wood
     }
 }

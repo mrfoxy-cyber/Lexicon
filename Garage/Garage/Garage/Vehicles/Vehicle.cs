@@ -1,4 +1,4 @@
-﻿using Engine;
+using Garage.Engines;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,9 +15,12 @@ namespace Garage.Vehicle
         public int ManufacturingYear { get; init; }
         public VehicleColor Color { get; set; }
         public double WeightKg { get; init; }
-        public List<Engine.Engine> Engines { get; init; } = [];
+        public List<Garage.Engines.Engine> Engines { get; init; } = [];
 
-        public int[] parkingSpaceRequired=new int[3];
+        public double Length { get; init}
+
+        public double width { get; init; }
+        public double height { get; init; }
 
     }
 }
