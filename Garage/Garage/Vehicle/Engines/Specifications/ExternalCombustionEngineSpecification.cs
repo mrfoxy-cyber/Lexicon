@@ -2,5 +2,5 @@ namespace Garage.Engines.Specifications;
 
 public abstract class ExternalCombustionEngineSpecification : EngineSpecification
 {
-    public FuelType FuelType { get; init; }
+    public required FuelType FuelType { get; init; }
 }

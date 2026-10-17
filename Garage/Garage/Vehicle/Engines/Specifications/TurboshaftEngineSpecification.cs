@@ -2,5 +2,5 @@ namespace Garage.Engines.Specifications;
 
 public class TurboshaftEngineSpecification : TurbineEngineSpecification
 {
-    public int ShaftHorsePower { get; init; }
+    public required int ShaftHorsePower { get; init; }
 }

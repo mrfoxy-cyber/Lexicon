@@ -2,7 +2,7 @@
 
 public class TruckSpecification : VehicleSpecification
 {
-    public int NumberOfWheels { get; init; }
-    public int NumberOfAxles { get; init; }
-    public double MaximumLoadKg { get; init; }
+    public required int NumberOfWheels { get; init; }
+    public required int NumberOfAxles { get; init; }
+    public required double MaximumLoadKg { get; init; }
 }

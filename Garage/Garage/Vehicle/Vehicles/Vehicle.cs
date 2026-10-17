@@ -14,8 +14,8 @@ namespace Garage.Vehicles
         public required string Manufacturer { get; init; }
         public required string Model { get; init; }
 
-        public int ManufacturingYear { get; init; }
-        public VehicleColor Color { get; set; }
+        public required int ManufacturingYear { get; init; }
+        public required VehicleColor Color { get; set; }
     }
 
     public abstract class Vehicle<TSpecification> : Vehicle

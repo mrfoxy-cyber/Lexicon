@@ -5,9 +5,9 @@ namespace Garage.Vehicles.Specifications;
 
 public class BoatSpecification : VehicleSpecification
 {
-    public BoatType BoatType { get; init; }
-    public double DraftMeters { get; init; }
-    public int PassengerCapacity { get; init; }
-    public int DriverSeats { get; init; }
+    public required BoatType BoatType { get; init; }
+    public required double DraftMeters { get; init; }
+    public required int PassengerCapacity { get; init; }
+    public required int DriverSeats { get; init; }
     public Cabin? Cabin { get; init; }
 }

@@ -6,7 +6,7 @@ namespace Garage.Vehicles.Components
 {
     public class Cockpit
     {
-        public int PilotSeats { get; init; }
-        public bool HasDualControls { get; init; }
+        public required int PilotSeats { get; init; }
+        public required bool HasDualControls { get; init; }
     }
 }

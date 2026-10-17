@@ -5,7 +5,7 @@ namespace Garage.Vehicles.Specifications;
 
 public abstract class VehicleSpecification
 {
-    public double WeightKg { get; init; }
+    public required double WeightKg { get; init; }
     public required Dimensions Dimensions { get; init; }
     public List<Engine> Engines { get; init; } = [];
 }

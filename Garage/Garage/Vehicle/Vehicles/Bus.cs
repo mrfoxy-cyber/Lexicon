@@ -9,7 +9,10 @@ namespace Garage.Vehicles
 {
     public class Bus : Vehicle<BusSpecification>, IPassengerCarrier, IHasWheels
     {
+        //ChassisNumber
         public required string Vin { get; init; }
+
+     
         public int NumberOfWheels => Specification.NumberOfWheels;
 
         public int PassengerCapacity =>
