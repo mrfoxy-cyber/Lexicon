@@ -1,4 +1,5 @@
 <Solution>
-  <Project Path="Garage/Garage.csproj" />
+  <Project Path="Garage.Console/Garage.Console.csproj" Id="384b1701-910f-4d16-a272-bef13fcd609e" />
   <Project Path="Garage.Tests/Garage.Tests.csproj" />
+  <Project Path="Garage/Garage.csproj" />
 </Solution>
