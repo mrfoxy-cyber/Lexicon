@@ -1,6 +1,7 @@
+using Garage.Engines.Specifications;
+
 namespace Garage.Engines.InternalCombustion.Turbine;
 
-public class TurbofanEngine : TurbineEngine
+public class TurbofanEngine : TurbineEngine<TurbofanEngineSpecification>
 {
-    public double BypassRatio { get; init; }
 }

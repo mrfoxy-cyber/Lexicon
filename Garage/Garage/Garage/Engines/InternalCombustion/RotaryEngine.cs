@@ -1,8 +1,7 @@
+using Garage.Engines.Specifications;
+
 namespace Garage.Engines.InternalCombustion;
 
-public class RotaryEngine : InternalCombustionEngine
+public class RotaryEngine : InternalCombustionEngine<RotaryEngineSpecification>
 {
-    public int HorsePower { get; init; }
-    public int DisplacementCc { get; init; }
-    public int RotorCount { get; init; }
 }

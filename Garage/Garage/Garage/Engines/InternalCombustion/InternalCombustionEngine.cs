@@ -1,8 +1,9 @@
 using Garage.Engines;
+using Garage.Engines.Specifications;
 
 namespace Garage.Engines.InternalCombustion;
 
-public abstract class InternalCombustionEngine : Engine
+public abstract class InternalCombustionEngine<TSpecification> : Engine<TSpecification>
+    where TSpecification : InternalCombustionEngineSpecification
 {
-    public FuelType FuelType { get; init; }
 }

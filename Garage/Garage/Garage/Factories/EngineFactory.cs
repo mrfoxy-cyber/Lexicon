@@ -4,6 +4,7 @@ using Garage.Engines.Electric;
 using Garage.Engines.ExternalCombustion;
 using Garage.Engines.InternalCombustion;
 using Garage.Engines.InternalCombustion.Piston;
+using Garage.Engines.Specifications;
 
 namespace Garage.Factories;
 
@@ -19,10 +20,13 @@ public static class EngineFactory
         return new InlineEngine
         {
             Model = model,
-            FuelType = fuelType,
-            HorsePower = horsePower,
-            DisplacementCc = displacementCc,
-            CylinderCount = cylinderCount
+            Specification = new PistonEngineSpecification
+            {
+                FuelType = fuelType,
+                HorsePower = horsePower,
+                DisplacementCc = displacementCc,
+                CylinderCount = cylinderCount
+            }
         };
     }
 
@@ -36,10 +40,13 @@ public static class EngineFactory
         return new VEngine
         {
             Model = model,
-            FuelType = fuelType,
-            HorsePower = horsePower,
-            DisplacementCc = displacementCc,
-            CylinderCount = cylinderCount
+            Specification = new PistonEngineSpecification
+            {
+                FuelType = fuelType,
+                HorsePower = horsePower,
+                DisplacementCc = displacementCc,
+                CylinderCount = cylinderCount
+            }
         };
     }
 
@@ -53,10 +60,13 @@ public static class EngineFactory
         return new FlatEngine
         {
             Model = model,
-            FuelType = fuelType,
-            HorsePower = horsePower,
-            DisplacementCc = displacementCc,
-            CylinderCount = cylinderCount
+            Specification = new PistonEngineSpecification
+            {
+                FuelType = fuelType,
+                HorsePower = horsePower,
+                DisplacementCc = displacementCc,
+                CylinderCount = cylinderCount
+            }
         };
     }
 
@@ -70,10 +80,13 @@ public static class EngineFactory
         return new RotaryEngine
         {
             Model = model,
-            FuelType = fuelType,
-            HorsePower = horsePower,
-            DisplacementCc = displacementCc,
-            RotorCount = rotorCount
+            Specification = new RotaryEngineSpecification
+            {
+                FuelType = fuelType,
+                HorsePower = horsePower,
+                DisplacementCc = displacementCc,
+                RotorCount = rotorCount
+            }
         };
     }
 
@@ -85,8 +98,11 @@ public static class EngineFactory
         return new ElectricMotor
         {
             Model = model,
-            PowerKw = powerKw,
-            Voltage = voltage
+            Specification = new ElectricEngineSpecification
+            {
+                PowerKw = powerKw,
+                Voltage = voltage
+            }
         };
     }
 
@@ -99,9 +115,12 @@ public static class EngineFactory
         return new SteamEngine
         {
             Model = model,
-            FuelType = fuelType,
-            HorsePower = horsePower,
-            BoilerPressureBar = boilerPressureBar
+            Specification = new SteamEngineSpecification
+            {
+                FuelType = fuelType,
+                HorsePower = horsePower,
+                BoilerPressureBar = boilerPressureBar
+            }
         };
     }
 
@@ -113,8 +132,11 @@ public static class EngineFactory
         return new TurbojetEngine
         {
             Model = model,
-            FuelType = fuelType,
-            ThrustKn = thrustKn
+            Specification = new TurbineEngineSpecification
+            {
+                FuelType = fuelType,
+                ThrustKn = thrustKn
+            }
         };
     }
 
@@ -127,9 +149,12 @@ public static class EngineFactory
         return new TurbofanEngine
         {
             Model = model,
-            FuelType = fuelType,
-            ThrustKn = thrustKn,
-            BypassRatio = bypassRatio
+            Specification = new TurbofanEngineSpecification
+            {
+                FuelType = fuelType,
+                ThrustKn = thrustKn,
+                BypassRatio = bypassRatio
+            }
         };
     }
 
@@ -142,9 +167,12 @@ public static class EngineFactory
         return new TurbopropEngine
         {
             Model = model,
-            FuelType = fuelType,
-            ThrustKn = thrustKn,
-            ShaftHorsePower = shaftHorsePower
+            Specification = new TurbopropEngineSpecification
+            {
+                FuelType = fuelType,
+                ThrustKn = thrustKn,
+                ShaftHorsePower = shaftHorsePower
+            }
         };
     }
 
@@ -157,9 +185,12 @@ public static class EngineFactory
         return new TurboshaftEngine
         {
             Model = model,
-            FuelType = fuelType,
-            ThrustKn = thrustKn,
-            ShaftHorsePower = shaftHorsePower
+            Specification = new TurboshaftEngineSpecification
+            {
+                FuelType = fuelType,
+                ThrustKn = thrustKn,
+                ShaftHorsePower = shaftHorsePower
+            }
         };
     }
 }

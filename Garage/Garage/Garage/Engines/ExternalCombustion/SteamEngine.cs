@@ -1,7 +1,7 @@
+using Garage.Engines.Specifications;
+
 namespace Garage.Engines.ExternalCombustion;
 
-public class SteamEngine : ExternalCombustionEngine
+public class SteamEngine : ExternalCombustionEngine<SteamEngineSpecification>
 {
-    public int HorsePower { get; init; }
-    public double BoilerPressureBar { get; init; }
 }
