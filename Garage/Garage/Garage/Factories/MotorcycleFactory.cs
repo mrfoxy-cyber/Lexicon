@@ -1,6 +1,7 @@
 using Garage.Engines;
 using Garage.Vehicles;
 using Garage.Vehicles.Components;
+using Garage.Vehicles.Specifications;
 using Garage.Vehicles.Types;
 
 namespace Garage.Factories;
@@ -32,18 +33,18 @@ public static class MotorcycleFactory
             Model = model,
             ManufacturingYear = manufacturingYear,
             Color = color,
-            WeightKg = weightKg,
-            Dimensions = new Dimensions(lengthMeters, widthMeters, heightMeters),
-            MotorcycleType = motorcycleType,
-            HasSidecar = hasSidecar,
-            NumberOfWheels = numberOfWheels,
-            PassengerCapacity = passengerCapacity,
-            DriverSeats = driverSeats,
-            Chassis = new Chassis
+            Vin = vin,
+            Specification = new MotorcycleSpecification
             {
-                Vin = vin
-            },
-            Engines = engines?.ToList() ?? []
+                WeightKg = weightKg,
+                Dimensions = new Dimensions(lengthMeters, widthMeters, heightMeters),
+                MotorcycleType = motorcycleType,
+                HasSidecar = hasSidecar,
+                NumberOfWheels = numberOfWheels,
+                PassengerCapacity = passengerCapacity,
+                DriverSeats = driverSeats,
+                Engines = engines?.ToList() ?? []
+            }
         };
     }
 }

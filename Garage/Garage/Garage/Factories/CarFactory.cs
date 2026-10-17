@@ -1,6 +1,7 @@
 ﻿using Garage.Engines;
 using Garage.Vehicles;
 using Garage.Vehicles.Components;
+using Garage.Vehicles.Specifications;
 using Garage.Vehicles.Types;
 
 namespace Garage.Factories;
@@ -30,25 +31,21 @@ public static class CarFactory
             Model = model,
             ManufacturingYear = manufacturingYear,
             Color = color,
-            WeightKg = weightKg,
-            Dimensions = new Dimensions(length, width, height),
-            NumberOfWheels = 4,
-
-            BodyType = bodyType,
-            NumberOfDoors = numberOfDoors,
-
-            Chassis = new Chassis
+            Vin = vin,
+            Specification = new CarSpecification
             {
-                Vin = vin
-            },
-
-            Cabin = new Cabin
-            {
-                PassengerSeatCount = numberOfSeats - 1,
-                CrewSeatCount = 1
-            },
-
-            Engines = engines ?? []
+                WeightKg = weightKg,
+                Dimensions = new Dimensions(length, width, height),
+                BodyType = bodyType,
+                NumberOfDoors = numberOfDoors,
+                NumberOfWheels = 4,
+                Cabin = new Cabin
+                {
+                    PassengerSeatCount = numberOfSeats - 1,
+                    CrewSeatCount = 1
+                },
+                Engines = engines ?? []
+            }
         };
     }
 }

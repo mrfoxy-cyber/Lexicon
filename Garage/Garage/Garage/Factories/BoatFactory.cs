@@ -1,6 +1,7 @@
 using Garage.Engines;
 using Garage.Vehicles;
 using Garage.Vehicles.Components;
+using Garage.Vehicles.Specifications;
 using Garage.Vehicles.Types;
 
 namespace Garage.Factories;
@@ -42,18 +43,18 @@ public static class BoatFactory
             Model = model,
             ManufacturingYear = manufacturingYear,
             Color = color,
-            WeightKg = weightKg,
-            Dimensions = new Dimensions(lengthMeters, widthMeters, heightMeters),
-            BoatType = boatType,
-            PassengerCapacity = passengerCapacity,
-            DriverSeats = driverSeats,
-            Cabin = cabin,
-            Hull = new Hull
+            Hin = hin,
+            Specification = new BoatSpecification
             {
-                Hin = hin,
-                DraftMeters = draftMeters
-            },
-            Engines = engines?.ToList() ?? []
+                WeightKg = weightKg,
+                Dimensions = new Dimensions(lengthMeters, widthMeters, heightMeters),
+                BoatType = boatType,
+                DraftMeters = draftMeters,
+                PassengerCapacity = passengerCapacity,
+                DriverSeats = driverSeats,
+                Cabin = cabin,
+                Engines = engines?.ToList() ?? []
+            }
         };
     }
 }

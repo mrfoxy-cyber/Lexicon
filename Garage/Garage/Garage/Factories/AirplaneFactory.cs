@@ -1,6 +1,7 @@
 ﻿using Garage.Engines;
 using Garage.Vehicles;
 using Garage.Vehicles.Components;
+using Garage.Vehicles.Specifications;
 using Garage.Vehicles.Types;
 
 namespace Garage.Factories;
@@ -41,26 +42,22 @@ public static class AirplaneFactory
             Model = model,
             ManufacturingYear = manufacturingYear,
             Color = color,
-            WeightKg = weightKg,
-            Dimensions = new Dimensions(lengthMeters, wingspanMeters, heightMeters),
-            NumberOfWheels = numberOfWheels,
-
-            MaximumAltitudeMeters = maximumAltitudeMeters,
-
-            Airframe = new Airframe
+            AirframeSerialNumber = airframeSerialNumber,
+            Specification = new AirplaneSpecification
             {
-                SerialNumber = airframeSerialNumber,
+                WeightKg = weightKg,
+                Dimensions = new Dimensions(lengthMeters, wingspanMeters, heightMeters),
+                NumberOfWheels = numberOfWheels,
                 WingspanMeters = wingspanMeters,
-                Cockpit = cockpit
-            },
-
-            Cabin = new Cabin
-            {
-                PassengerSeatCount = passengerSeatCount,
-                CrewSeatCount = crewSeatCount
-            },
-
-            Engines = engines?.ToList() ?? []
+                MaximumAltitudeMeters = maximumAltitudeMeters,
+                Cockpit = cockpit,
+                Cabin = new Cabin
+                {
+                    PassengerSeatCount = passengerSeatCount,
+                    CrewSeatCount = crewSeatCount
+                },
+                Engines = engines?.ToList() ?? []
+            }
         };
     }
 }
