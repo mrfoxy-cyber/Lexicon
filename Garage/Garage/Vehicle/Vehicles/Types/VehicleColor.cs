@@ -16,6 +16,7 @@ namespace Garage.Vehicles.Types
         Yellow,
         Orange,
         Brown,
-        Purple
+        Purple,
+        Pink
     }
 }
