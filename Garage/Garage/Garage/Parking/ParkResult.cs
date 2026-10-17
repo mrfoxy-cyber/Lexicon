@@ -8,6 +8,6 @@ namespace Garage.Parking
     bool Success,
     int? SpotIndex,
     string Message
-    
+        
     );
 }

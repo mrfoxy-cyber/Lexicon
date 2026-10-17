@@ -21,7 +21,7 @@ public static class CarFactory
         BodyType bodyType,
         int numberOfDoors,
         int numberOfSeats,
-        IEnumerable<Engine>? engines = null)
+        List<Engine>? engines = null)
     {
         return new Car
         {
@@ -48,7 +48,7 @@ public static class CarFactory
                 CrewSeatCount = 1
             },
 
-            Engines = engines?.ToList() ?? []
+            Engines = engines ?? []
         };
     }
 }

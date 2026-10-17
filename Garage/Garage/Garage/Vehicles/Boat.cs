@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 
-using Garage.Vehicles.Components;
-using Garage.Vehicles.Types;
+using Garage.Vehicles.Interfaces;
+using Garage.Vehicles.Specifications;
 
 namespace Garage.Vehicles
 {
-    public class Boat : Vehicle, IPassengerCarrier
+    public class Boat : Vehicle<BoatSpecification>, IPassengerCarrier
     {
-        public required Hull Hull { get; init; }
-        public Cabin? Cabin { get; init; }
+        public required string Hin { get; init; }
 
-        public BoatType BoatType { get; init; }
-        public int PassengerCapacity { get; init; }
-        public bool HasCabin => Cabin is not null;
+        public int PassengerCapacity => Specification.PassengerCapacity;
+        public bool HasCabin => Specification.Cabin is not null;
 
-        public int DriverSeats { get; init; }
+        public int DriverSeats => Specification.DriverSeats;
     }
 }

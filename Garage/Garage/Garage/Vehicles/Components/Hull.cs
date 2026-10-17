@@ -6,7 +6,7 @@ namespace Garage.Vehicles.Components
 {
     public class Hull
     {
-        public required string IdentificationNumber { get; init; }
+        public required string Hin { get; init; }
         public double DraftMeters { get; init; }
     }
 }

@@ -2,22 +2,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Garage.Vehicles.Components;
+using Garage.Vehicles.Interfaces;
+using Garage.Vehicles.Specifications;
 
 namespace Garage.Vehicles
 {
-    public class Bus : Vehicle, IPassengerCarrier, IHasWheels
+    public class Bus : Vehicle<BusSpecification>, IPassengerCarrier, IHasWheels
     {
-        public required Chassis Chassis { get; init; }
-
-        public required Cabin Cabin { get; init; }
-        public int NumberOfDoors { get; init; }
-        public int NumberOfWheels { get; init; }
-        public int StandingPassengerCapacity { get; init; }
+        public required string Vin { get; init; }
+        public int NumberOfWheels => Specification.NumberOfWheels;
 
         public int PassengerCapacity =>
-            Cabin.PassengerSeatCount + StandingPassengerCapacity;
+            Specification.Cabin.PassengerSeatCount +
+            Specification.StandingPassengerCapacity;
 
-        public int DriverSeats => Cabin.CrewSeatCount;
+        public int DriverSeats => Specification.Cabin.CrewSeatCount;
     }
 }

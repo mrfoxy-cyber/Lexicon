@@ -1,9 +1,9 @@
-using Garage.Engines;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Garage.Vehicles.Types;
-using Garage.Vehicles.Components;
+using Garage.Vehicles.Interfaces;
+using Garage.Vehicles.Specifications;
 
 namespace Garage.Vehicles
 {
@@ -16,9 +16,11 @@ namespace Garage.Vehicles
 
         public int ManufacturingYear { get; init; }
         public VehicleColor Color { get; set; }
-        public double WeightKg { get; init; }
-        public required Dimensions Dimensions { get; init; }
-        public List<Engine> Engines { get; init; } = [];
+    }
 
+    public abstract class Vehicle<TSpecification> : Vehicle
+        where TSpecification : VehicleSpecification
+    {
+        public required TSpecification Specification { get; init; }
     }
 }

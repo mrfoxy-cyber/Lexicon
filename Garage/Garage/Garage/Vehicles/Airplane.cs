@@ -2,20 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Garage.Vehicles.Components;
+using Garage.Vehicles.Interfaces;
+using Garage.Vehicles.Specifications;
 
 namespace Garage.Vehicles
 {
-    public class Airplane : Vehicle, IPassengerCarrier, IHasWheels
+    public class Airplane : Vehicle<AirplaneSpecification>, IPassengerCarrier, IHasWheels
     {
-        public required Airframe Airframe { get; init; }
+        public required string AirframeSerialNumber { get; init; }
+        public int NumberOfWheels => Specification.NumberOfWheels;
 
-        public required Cabin Cabin { get; init; }
-        public int NumberOfWheels { get; init; }
-        public double MaximumAltitudeMeters { get; init; }
+        public int PassengerCapacity => Specification.Cabin.PassengerSeatCount;
 
-        public int PassengerCapacity => Cabin.PassengerSeatCount;
-
-        public int DriverSeats => Cabin.CrewSeatCount;
+        public int DriverSeats => Specification.Cabin.CrewSeatCount;
     }
 }
