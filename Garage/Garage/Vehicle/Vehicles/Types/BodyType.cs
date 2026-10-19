@@ -8,6 +8,5 @@ public enum BodyType
     Coupe,
     Convertible,
     Van,
-    Pickup,
-    Motorcycle
+    Pickup
 }

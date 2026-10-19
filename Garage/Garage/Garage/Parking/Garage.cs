@@ -8,6 +8,7 @@ namespace Garage.Parking;
 public class Garage<T> where T : Vehicle
 {
     private readonly T?[] vehicles;
+    public const int MaximumGarageCapacity = 1_000;
 
     public Garage(
         string name,
@@ -61,6 +62,7 @@ public class Garage<T> where T : Vehicle
             vehicles[index] = startingVehicles[index];
         }
     }
+
 
     public string GarageName { get; }
 
