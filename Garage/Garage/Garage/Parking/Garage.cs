@@ -8,7 +8,7 @@ namespace Garage.Parking;
 public class Garage<T> where T : Vehicle
 {
     private readonly T?[] vehicles;
-    public const int MaximumGarageCapacity = 1_000;
+    public const int MaximumGarageCapacity = 100_000;
 
     public string GarageName { get; }
 
@@ -473,10 +473,26 @@ public class Garage<T> where T : Vehicle
             return false;
         }
 
-        if (criteria.VehicleType is not null &&
-            !criteria.VehicleType.IsInstanceOfType(vehicle))
+        if (criteria.VehicleTypes.Length > 0)
         {
-            return false;
+            bool matchesVehicleType = false;
+
+            for (int index = 0;
+                 index < criteria.VehicleTypes.Length;
+                 index++)
+            {
+                if (criteria.VehicleTypes[index]
+                    .IsInstanceOfType(vehicle))
+                {
+                    matchesVehicleType = true;
+                    break;
+                }
+            }
+
+            if (!matchesVehicleType)
+            {
+                return false;
+            }
         }
 
         if (criteria.NumberOfWheels is not null)

@@ -3,12 +3,18 @@
 public sealed class MenuOption
 {
     private readonly Action action;
+    private readonly Func<string> textProvider;
 
-    public string Text { get; }
+    public string Text => textProvider();
 
     public MenuOption(string text, Action action)
+        : this(() => text, action)
     {
-        Text = text;
+    }
+
+    public MenuOption(Func<string> textProvider, Action action)
+    {
+        this.textProvider = textProvider;
         this.action = action;
     }
 

@@ -104,7 +104,7 @@ public sealed class GarageApplication
         int capacity = ConsoleInput.ReadInt(
             "Number of parking spots: ",
             minimum: 1,
-            maximum: int.MaxValue);
+            maximum: VehicleGarage.MaximumGarageCapacity);
 
         VehicleGarage garage = new(
             garageName: name,
@@ -141,6 +141,10 @@ public sealed class GarageApplication
                 new MenuOption(
                     "Find vehicle by registration number",
                     actions.FindVehicleByRegistration),
+
+                new MenuOption(
+                    "Search vehicles",
+                    actions.SearchVehicles),
 
                 new MenuOption(
                     "Remove vehicle",

@@ -1,5 +1,6 @@
 using Garage.ConsoleApp.ConsoleFramework;
 using Garage.Results;
+using Garage.Search;
 using Garage.Vehicles;
 using VehicleGarage = Garage.Parking.Garage<Garage.Vehicles.Vehicle>;
 
@@ -176,6 +177,79 @@ public sealed class GarageActions
             garage.Remove(registrationNumber);
 
         Console.WriteLine(result.Message);
+        ConsoleInput.Pause();
+    }
+
+    public void SearchVehicles()
+    {
+        SearchCriteriaCreator criteriaCreator = new();
+
+        ConsoleMenu searchMenu = new(
+            title: "Search vehicles",
+            options:
+            [
+                new MenuOption(
+                    () => $"Vehicle types: {criteriaCreator.VehicleTypesText}",
+                    criteriaCreator.ChooseVehicleTypes),
+
+                new MenuOption(
+                    () => $"Color: {criteriaCreator.ColorText}",
+                    criteriaCreator.ChooseColor),
+
+                new MenuOption(
+                    () => $"Number of wheels: {criteriaCreator.NumberOfWheelsText}",
+                    criteriaCreator.ChooseNumberOfWheels),
+
+                new MenuOption(
+                    () => $"Registration number: {criteriaCreator.RegistrationNumberText}",
+                    criteriaCreator.ChooseRegistrationNumber),
+
+                new MenuOption(
+                    () => $"Manufacturer: {criteriaCreator.ManufacturerText}",
+                    criteriaCreator.ChooseManufacturer),
+
+                new MenuOption(
+                    () => $"Model: {criteriaCreator.ModelText}",
+                    criteriaCreator.ChooseModel),
+
+                new MenuOption(
+                    () => $"Manufacturing year: {criteriaCreator.ManufacturingYearText}",
+                    criteriaCreator.ChooseManufacturingYear),
+
+                new MenuOption(
+                    "Run search",
+                    () => ShowSearchResults(criteriaCreator.Create())),
+
+                new MenuOption(
+                    "Clear all filters",
+                    criteriaCreator.Clear)
+            ]);
+
+        searchMenu.Show();
+    }
+
+    private void ShowSearchResults(VehicleSearchCriteria criteria)
+    {
+        Vehicle[] matches = garage.Search(criteria);
+
+        Console.Clear();
+        Console.WriteLine($"Found {matches.Length} vehicle(s).");
+        Console.WriteLine();
+
+        for (int index = 0; index < matches.Length; index++)
+        {
+            Vehicle vehicle = matches[index];
+            var parkedVehicle = garage.FindVehicleByRegistration(
+                vehicle.RegistrationNumber);
+
+            if (parkedVehicle is not null)
+            {
+                PrintVehicle(
+                    parkedVehicle.Value.SpotIndex + 1,
+                    vehicle);
+            }
+        }
+
         ConsoleInput.Pause();
     }
 

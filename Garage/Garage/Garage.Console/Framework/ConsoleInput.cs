@@ -39,6 +39,46 @@ public static class ConsoleInput
         }
     }
 
+    public static string? ReadOptionalString(string prompt)
+    {
+        Console.Write(prompt);
+
+        string? input = Console.ReadLine()?.Trim();
+
+        return string.IsNullOrWhiteSpace(input)
+            ? null
+            : input;
+    }
+
+    public static int? ReadOptionalInt(
+        string prompt,
+        int minimum,
+        int maximum)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+
+            string? input = Console.ReadLine()?.Trim();
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return null;
+            }
+
+            if (int.TryParse(input, out int value) &&
+                value >= minimum &&
+                value <= maximum)
+            {
+                return value;
+            }
+
+            Console.WriteLine(
+                $"Enter a number between {minimum} and {maximum}, " +
+                "or leave it empty for Any.");
+        }
+    }
+
     public static double ReadDouble(
         string prompt,
         double minimum,
@@ -103,6 +143,29 @@ public static class ConsoleInput
             maximum: values.Length);
 
         return values[choice - 1];
+    }
+
+    public static TEnum? ReadOptionalEnum<TEnum>(string prompt)
+        where TEnum : struct, Enum
+    {
+        TEnum[] values = Enum.GetValues<TEnum>();
+
+        Console.WriteLine(prompt);
+        Console.WriteLine("0. Any");
+
+        for (int index = 0; index < values.Length; index++)
+        {
+            Console.WriteLine($"{index + 1}. {values[index]}");
+        }
+
+        int choice = ReadInt(
+            "Choose: ",
+            minimum: 0,
+            maximum: values.Length);
+
+        return choice == 0
+            ? null
+            : values[choice - 1];
     }
 
     public static void Pause()
