@@ -11,6 +11,9 @@ namespace Garage.Engines
         public required string SerialNumber { get; init; }
         public required string Model { get; init; }
 
+        public virtual FuelType? FuelType => null;
+        public virtual double? CylinderVolumeCc => null;
+
         public bool Equals(Engine? other)
         {
             return other is not null &&

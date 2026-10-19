@@ -5,6 +5,11 @@ namespace Garage.Vehicles.Specifications;
 
 public abstract class VehicleSpecification
 {
+    public const int MaximumNumberOfEngines = 100;
+    public const int MaximumNumberOfSeats = 10_000;
+    public const int MaximumNumberOfWheels = 100;
+    public const double MaximumLengthMeters = 1_000;
+
     public required double WeightKg { get; init; }
     public required Dimensions Dimensions { get; init; }
     private Engine[] engines = [];
@@ -12,11 +17,29 @@ public abstract class VehicleSpecification
     public Engine[] Engines
     {
         get => [.. engines];
-        init => engines = [.. value];
+        init
+        {
+            if (value.Length > MaximumNumberOfEngines)
+            {
+                throw new ArgumentException(
+                    $"A vehicle cannot have more than " +
+                    $"{MaximumNumberOfEngines} engines.",
+                    nameof(value));
+            }
+
+            engines = [.. value];
+        }
     }
 
     public void AddEngine (Engine engine)
     {
+        if (engines.Length >= MaximumNumberOfEngines)
+        {
+            throw new InvalidOperationException(
+                $"A vehicle cannot have more than " +
+                $"{MaximumNumberOfEngines} engines.");
+        }
+
         Array.Resize(ref engines, engines.Length + 1);
         engines[^1] = engine;
     }

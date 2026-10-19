@@ -7,7 +7,7 @@ using Garage.Vehicles.Specifications;
 
 namespace Garage.Vehicles
 {
-    public class Boat : Vehicle<BoatSpecification>, IPassengerCarrier
+    public class Boat : Vehicle<BoatSpecification>, IPassengerCarrier, IHasSeats
     {
         public required string Hin { get; init; }
 
@@ -15,5 +15,7 @@ namespace Garage.Vehicles
         public bool HasCabin => Specification.Cabin is not null;
 
         public int DriverSeats => Specification.DriverSeats;
+
+        public int NumberOfSeats => PassengerCapacity + DriverSeats;
     }
 }

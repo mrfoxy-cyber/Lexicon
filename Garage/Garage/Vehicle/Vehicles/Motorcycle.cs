@@ -6,7 +6,7 @@ using Garage.Vehicles.Specifications;
 
 namespace Garage.Vehicles;
 
-public class Motorcycle : Vehicle<MotorcycleSpecification>, IPassengerCarrier, IHasWheels
+public class Motorcycle : Vehicle<MotorcycleSpecification>, IPassengerCarrier, IHasWheels, IHasSeats
 {
     public required string Vin { get; init; }
     public int NumberOfWheels => Specification.NumberOfWheels;
@@ -14,4 +14,6 @@ public class Motorcycle : Vehicle<MotorcycleSpecification>, IPassengerCarrier, I
     public int PassengerCapacity => Specification.PassengerCapacity;
 
     public int DriverSeats => Specification.DriverSeats;
+
+    public int NumberOfSeats => PassengerCapacity + DriverSeats;
 }

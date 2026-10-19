@@ -6,4 +6,5 @@ namespace Garage.Engines.InternalCombustion;
 public abstract class InternalCombustionEngine<TSpecification> : Engine<TSpecification>
     where TSpecification : InternalCombustionEngineSpecification
 {
+    public override FuelType? FuelType => Specification.FuelType;
 }

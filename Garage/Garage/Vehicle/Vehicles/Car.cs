@@ -7,12 +7,14 @@ using Garage.Vehicles.Specifications;
 
 namespace Garage.Vehicles
 {
-    public class Car : Vehicle<CarSpecification>, IPassengerCarrier, IHasWheels
+    public class Car : Vehicle<CarSpecification>, IPassengerCarrier, IHasWheels, IHasSeats
     {
         public required string Vin { get; init; }
         public int PassengerCapacity => Specification.Cabin.PassengerSeatCount;
         public int NumberOfWheels => Specification.NumberOfWheels;
 
         public int DriverSeats => Specification.Cabin.CrewSeatCount;
+
+        public int NumberOfSeats => PassengerCapacity + DriverSeats;
     }
 }

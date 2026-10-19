@@ -16,11 +16,16 @@ namespace Garage.Vehicles
 
         public required int ManufacturingYear { get; init; }
         public required VehicleColor Color { get; set; }
+
+        public abstract VehicleSpecification SpecificationDetails { get; }
     }
 
     public abstract class Vehicle<TSpecification> : Vehicle
         where TSpecification : VehicleSpecification
     {
         public required TSpecification Specification { get; init; }
+
+        public override VehicleSpecification SpecificationDetails =>
+            Specification;
     }
 }

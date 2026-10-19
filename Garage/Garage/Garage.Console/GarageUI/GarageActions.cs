@@ -201,6 +201,26 @@ public sealed class GarageActions
                     criteriaCreator.ChooseNumberOfWheels),
 
                 new MenuOption(
+                    () => $"Number of engines: {criteriaCreator.NumberOfEnginesText}",
+                    criteriaCreator.ChooseNumberOfEngines),
+
+                new MenuOption(
+                    () => $"Cylinder volume (cc): {criteriaCreator.CylinderVolumeText}",
+                    criteriaCreator.ChooseCylinderVolume),
+
+                new MenuOption(
+                    () => $"Fuel type: {criteriaCreator.FuelTypeText}",
+                    criteriaCreator.ChooseFuelType),
+
+                new MenuOption(
+                    () => $"Number of seats: {criteriaCreator.NumberOfSeatsText}",
+                    criteriaCreator.ChooseNumberOfSeats),
+
+                new MenuOption(
+                    () => $"Length (m): {criteriaCreator.LengthText}",
+                    criteriaCreator.ChooseLength),
+
+                new MenuOption(
                     () => $"Registration number: {criteriaCreator.RegistrationNumberText}",
                     criteriaCreator.ChooseRegistrationNumber),
 

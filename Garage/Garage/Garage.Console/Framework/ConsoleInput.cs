@@ -100,6 +100,35 @@ public static class ConsoleInput
         }
     }
 
+    public static double? ReadOptionalDouble(
+        string prompt,
+        double minimum,
+        double maximum)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+
+            string? input = Console.ReadLine()?.Trim();
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return null;
+            }
+
+            if (double.TryParse(input, out double value) &&
+                value >= minimum &&
+                value <= maximum)
+            {
+                return value;
+            }
+
+            Console.WriteLine(
+                $"Enter a number between {minimum} and {maximum}, " +
+                "or leave it empty for Any.");
+        }
+    }
+
     public static bool ReadBoolean(string prompt)
     {
         while (true)

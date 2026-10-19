@@ -509,6 +509,76 @@ public class Garage<T> where T : Vehicle
             }
         }
 
+        var engines = vehicle.SpecificationDetails.Engines;
+
+        if (criteria.NumberOfEngines is not null &&
+            engines.Length != criteria.NumberOfEngines)
+        {
+            return false;
+        }
+
+        if (criteria.FuelType is not null)
+        {
+            bool hasMatchingFuelType = false;
+
+            for (int index = 0; index < engines.Length; index++)
+            {
+                if (engines[index].FuelType == criteria.FuelType)
+                {
+                    hasMatchingFuelType = true;
+                    break;
+                }
+            }
+
+            if (!hasMatchingFuelType)
+            {
+                return false;
+            }
+        }
+
+        if (criteria.CylinderVolumeCc is not null)
+        {
+            bool hasMatchingCylinderVolume = false;
+
+            for (int index = 0; index < engines.Length; index++)
+            {
+                double? cylinderVolume =
+                    engines[index].CylinderVolumeCc;
+
+                if (cylinderVolume is not null &&
+                    Math.Abs(
+                        cylinderVolume.Value -
+                        criteria.CylinderVolumeCc.Value) < 0.01)
+                {
+                    hasMatchingCylinderVolume = true;
+                    break;
+                }
+            }
+
+            if (!hasMatchingCylinderVolume)
+            {
+                return false;
+            }
+        }
+
+        if (criteria.NumberOfSeats is not null)
+        {
+            if (vehicle is not IHasSeats vehicleWithSeats ||
+                vehicleWithSeats.NumberOfSeats !=
+                criteria.NumberOfSeats)
+            {
+                return false;
+            }
+        }
+
+        if (criteria.LengthMeters is not null &&
+            Math.Abs(
+                vehicle.SpecificationDetails.Dimensions.LengthMeters -
+                criteria.LengthMeters.Value) >= 0.01)
+        {
+            return false;
+        }
+
         return true;
     }
 }

@@ -1,6 +1,9 @@
 using Garage.ConsoleApp.ConsoleFramework;
+using Garage.Engines;
+using Garage.Engines.Specifications;
 using Garage.Search;
 using Garage.Vehicles;
+using Garage.Vehicles.Specifications;
 using Garage.Vehicles.Types;
 
 namespace Garage.ConsoleApp.GarageUI;
@@ -20,6 +23,11 @@ public sealed class SearchCriteriaCreator
     private readonly bool[] selectedVehicleTypes = new bool[6];
     private VehicleColor? color;
     private int? numberOfWheels;
+    private int? numberOfEngines;
+    private double? cylinderVolumeCc;
+    private FuelType? fuelType;
+    private int? numberOfSeats;
+    private double? lengthMeters;
     private string? registrationNumber;
     private string? manufacturer;
     private string? model;
@@ -54,6 +62,14 @@ public sealed class SearchCriteriaCreator
     public string ColorText => color?.ToString() ?? "Any";
     public string NumberOfWheelsText =>
         numberOfWheels?.ToString() ?? "Any";
+    public string NumberOfEnginesText =>
+        numberOfEngines?.ToString() ?? "Any";
+    public string CylinderVolumeText =>
+        cylinderVolumeCc?.ToString() ?? "Any";
+    public string FuelTypeText => fuelType?.ToString() ?? "Any";
+    public string NumberOfSeatsText =>
+        numberOfSeats?.ToString() ?? "Any";
+    public string LengthText => lengthMeters?.ToString() ?? "Any";
     public string RegistrationNumberText =>
         registrationNumber ?? "Any";
     public string ManufacturerText => manufacturer ?? "Any";
@@ -68,6 +84,11 @@ public sealed class SearchCriteriaCreator
             VehicleTypes = CreateSelectedVehicleTypes(),
             Color = color,
             NumberOfWheels = numberOfWheels,
+            NumberOfEngines = numberOfEngines,
+            CylinderVolumeCc = cylinderVolumeCc,
+            FuelType = fuelType,
+            NumberOfSeats = numberOfSeats,
+            LengthMeters = lengthMeters,
             RegistrationNumber = registrationNumber,
             Manufacturer = manufacturer,
             Model = model,
@@ -125,7 +146,44 @@ public sealed class SearchCriteriaCreator
         numberOfWheels = ConsoleInput.ReadOptionalInt(
             "Number of wheels (empty = Any): ",
             minimum: 0,
-            maximum: 100);
+            maximum: VehicleSpecification.MaximumNumberOfWheels);
+    }
+
+    public void ChooseNumberOfEngines()
+    {
+        numberOfEngines = ConsoleInput.ReadOptionalInt(
+            "Number of engines (empty = Any): ",
+            minimum: 0,
+            maximum: VehicleSpecification.MaximumNumberOfEngines);
+    }
+
+    public void ChooseCylinderVolume()
+    {
+        cylinderVolumeCc = ConsoleInput.ReadOptionalDouble(
+            "Cylinder volume in cc (empty = Any): ",
+            minimum: 0,
+            maximum: PistonEngineSpecification.MaximumCylinderVolumeCc);
+    }
+
+    public void ChooseFuelType()
+    {
+        fuelType = ConsoleInput.ReadOptionalEnum<FuelType>("Fuel type:");
+    }
+
+    public void ChooseNumberOfSeats()
+    {
+        numberOfSeats = ConsoleInput.ReadOptionalInt(
+            "Number of seats (empty = Any): ",
+            minimum: 0,
+            maximum: VehicleSpecification.MaximumNumberOfSeats);
+    }
+
+    public void ChooseLength()
+    {
+        lengthMeters = ConsoleInput.ReadOptionalDouble(
+            "Length in meters (empty = Any): ",
+            minimum: 0,
+            maximum: VehicleSpecification.MaximumLengthMeters);
     }
 
     public void ChooseRegistrationNumber()
@@ -165,6 +223,11 @@ public sealed class SearchCriteriaCreator
 
         color = null;
         numberOfWheels = null;
+        numberOfEngines = null;
+        cylinderVolumeCc = null;
+        fuelType = null;
+        numberOfSeats = null;
+        lengthMeters = null;
         registrationNumber = null;
         manufacturer = null;
         model = null;

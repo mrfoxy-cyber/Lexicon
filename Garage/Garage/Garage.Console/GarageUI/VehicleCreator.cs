@@ -1,6 +1,7 @@
 using Garage.ConsoleApp.ConsoleFramework;
 using Garage.Factories;
 using Garage.Vehicles;
+using Garage.Vehicles.Specifications;
 using Garage.Vehicles.Types;
 
 namespace Garage.ConsoleApp.GarageUI;
@@ -80,7 +81,9 @@ public sealed class VehicleCreator
         string serialNumber = ConsoleInput.ReadRequiredString(
             "Airframe serial number: ");
         int numberOfWheels = ConsoleInput.ReadInt(
-            "Number of wheels: ", 0, 100);
+            "Number of wheels: ",
+            0,
+            VehicleSpecification.MaximumNumberOfWheels);
         int passengerSeats = ConsoleInput.ReadInt(
             "Passenger seats: ", 0, 1_000);
         int crewSeats = ConsoleInput.ReadInt(
@@ -120,7 +123,9 @@ public sealed class VehicleCreator
         int numberOfDoors = ConsoleInput.ReadInt(
             "Number of doors: ", 1, 20);
         int numberOfWheels = ConsoleInput.ReadInt(
-            "Number of wheels: ", 2, 100);
+            "Number of wheels: ",
+            2,
+            VehicleSpecification.MaximumNumberOfWheels);
         int passengerSeats = ConsoleInput.ReadInt(
             "Passenger seats: ", 0, 500);
         int standingCapacity = ConsoleInput.ReadInt(
@@ -197,7 +202,9 @@ public sealed class VehicleCreator
 
         string vin = ConsoleInput.ReadRequiredString("VIN: ");
         int numberOfWheels = ConsoleInput.ReadInt(
-            "Number of wheels: ", 2, 100);
+            "Number of wheels: ",
+            2,
+            VehicleSpecification.MaximumNumberOfWheels);
         int numberOfAxles = ConsoleInput.ReadInt(
             "Number of axles: ", 1, 20);
         double maximumLoadKg = ConsoleInput.ReadDouble(
@@ -255,7 +262,10 @@ public sealed class VehicleCreator
 
     private static double ReadMeasurement(string prompt)
     {
-        return ConsoleInput.ReadDouble(prompt, 0.01, 1_000);
+        return ConsoleInput.ReadDouble(
+            prompt,
+            0.01,
+            VehicleSpecification.MaximumLengthMeters);
     }
 
     private sealed record VehicleInput(

@@ -7,7 +7,7 @@ using Garage.Vehicles.Specifications;
 
 namespace Garage.Vehicles
 {
-    public class Bus : Vehicle<BusSpecification>, IPassengerCarrier, IHasWheels
+    public class Bus : Vehicle<BusSpecification>, IPassengerCarrier, IHasWheels, IHasSeats
     {
         //ChassisNumber
         public required string Vin { get; init; }
@@ -20,5 +20,8 @@ namespace Garage.Vehicles
             Specification.StandingPassengerCapacity;
 
         public int DriverSeats => Specification.Cabin.CrewSeatCount;
+
+        public int NumberOfSeats =>
+            Specification.Cabin.PassengerSeatCount + DriverSeats;
     }
 }
