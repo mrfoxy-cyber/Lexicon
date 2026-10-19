@@ -212,6 +212,33 @@ public class Garage<T> where T : Vehicle
             $"from parking spot {match.SpotIndex + 1}.");
     }
 
+    public GarageOperationResult RemoveAtSpot(int spotNumber)
+    {
+        if (spotNumber < 1 || spotNumber > Capacity)
+        {
+            return new GarageOperationResult
+            (
+                false,
+                null,
+                $"Parking spot must be between 1 and {Capacity}."
+            );
+        }
+
+        int spotIndex = spotNumber - 1;
+
+        T? vehicle = vehicles[spotIndex];
+
+        if(vehicle is null)
+        {
+            return new GarageOperationResult(
+                false,
+                null,
+                 $"Parking spot {spotNumber} is already empty."
+                );
+        }
+
+        return Remove(vehicle.RegistrationNumber);
+    }
     public IEnumerable<(int SpotNumber, T Vehicle)> ParkedVehicles
     {
         get
