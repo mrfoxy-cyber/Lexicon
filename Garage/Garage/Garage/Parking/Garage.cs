@@ -2,7 +2,6 @@ using Garage.Results;
 using Garage.Search;
 using Garage.Vehicles;
 using Garage.Vehicles.Interfaces;
-using System.Xml.Linq;
 
 namespace Garage.Parking;
 
@@ -15,12 +14,123 @@ public class Garage<T> where T : Vehicle
 
     public int Capacity { get; private  init; }
 
-    public int OccupiedSpaces =>
-        vehicles.Count(vehicle => vehicle is not null);
+    public int OccupiedSpaces
+    {
+        get
+        {
+            int count = 0;
+
+            for (int index = 0;
+                 index < vehicles.Length;
+                 index++)
+            {
+                if (vehicles[index] is not null)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+    }
 
     public int AvailableSpaces => Capacity - OccupiedSpaces;
 
-    public Vehicle[] Vehicles => [.. vehicles.OfType<T>()];
+    public T[] Vehicles
+    {
+        get
+        {
+            T[] parkedVehicles =
+                new T[OccupiedSpaces];
+
+            int parkedVehicleIndex = 0;
+
+            for (int index = 0;
+                 index < vehicles.Length;
+                 index++)
+            {
+                if (vehicles[index] is T vehicle)
+                {
+                    parkedVehicles[parkedVehicleIndex] =
+                        vehicle;
+
+                    parkedVehicleIndex++;
+                }
+            }
+
+            return parkedVehicles;
+        }
+    }
+
+    private static bool HasDuplicateRegistrations(
+    T[] vehicles)
+    {
+        for (int firstIndex = 0;
+             firstIndex < vehicles.Length;
+             firstIndex++)
+        {
+            for (int secondIndex = firstIndex + 1;
+                 secondIndex < vehicles.Length;
+                 secondIndex++)
+            {
+                bool registrationsMatch =
+                    vehicles[firstIndex]
+                        .RegistrationNumber
+                        .Equals(
+                            vehicles[secondIndex]
+                                .RegistrationNumber,
+                            StringComparison.OrdinalIgnoreCase);
+
+                if (registrationsMatch)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private bool RegistrationExists(
+    string registrationNumber)
+    {
+        for (int index = 0;
+             index < vehicles.Length;
+             index++)
+        {
+            T? parkedVehicle = vehicles[index];
+
+            if (parkedVehicle is not null &&
+                parkedVehicle.RegistrationNumber.Equals(
+                    registrationNumber,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public (int SpotIndex, T Vehicle)? FindVehicleByRegistration( string registrationNumber)
+    {
+        for (int index = 0;
+             index < vehicles.Length;
+             index++)
+        {
+            if (vehicles[index] is T vehicle &&
+                vehicle.RegistrationNumber.Equals(
+                    registrationNumber,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return (
+                    SpotIndex: index,
+                    Vehicle: vehicle);
+            }
+        }
+
+        return null;
+    }
 
     public Garage(
         string garageName,
@@ -34,12 +144,11 @@ public class Garage<T> where T : Vehicle
 
     public Garage(
         string garageName,
-        T?[] vehicles)
+        T[] vehicles)
         : this(
             garageName: garageName,
             capacity: vehicles.Length,
-            initialVehicles:
-                [.. vehicles.OfType<T>()])
+            initialVehicles: vehicles)
     {
     }
 
@@ -74,6 +183,13 @@ public class Garage<T> where T : Vehicle
                 nameof(initialVehicles));
         }
 
+        if (HasDuplicateRegistrations(startingVehicles))
+        {
+            throw new ArgumentException(
+                "Initial vehicles contain duplicate registration numbers.",
+                nameof(initialVehicles));
+        }
+
         this.GarageName = garageName;
         this.Capacity = capacity;
         this.vehicles = new T?[capacity];
@@ -84,58 +200,8 @@ public class Garage<T> where T : Vehicle
             startingVehicles.Length);
     }
 
-
-
-    public GarageOperationResult ParkAtSpot( T vehicle, int spotNumber)
-    {
-        if (spotNumber < 1 ||
-            spotNumber > Capacity)
-        {
-            return new GarageOperationResult(
-                false,
-                null,
-                $"Parking spot must be between 1 and {Capacity}.");
-        }
-
-        if (FindVehiclesByRegistration(
-                vehicle.RegistrationNumber).Any())
-        {
-            return new GarageOperationResult(
-                false,
-                null,
-                "A vehicle with this registration number already exists.");
-        }
-
-        int spotIndex = spotNumber - 1;
-
-        if (vehicles[spotIndex] is not null)
-        {
-            return new GarageOperationResult(
-                false,
-                spotIndex,
-                $"Parking spot {spotNumber} is already occupied.");
-        }
-
-        vehicles[spotIndex] = vehicle;
-
-        return new GarageOperationResult(
-            true,
-            spotIndex,
-            $"Vehicle parked at spot {spotNumber}.");
-    }
-
-
     public GarageOperationResult Park(T vehicle)
     {
-        if (FindVehiclesByRegistration(
-         vehicle.RegistrationNumber).Any())
-        {
-            return new GarageOperationResult(
-                false,
-                null,
-                "A vehicle with this licence plate already exists.");
-        }
-
         int availableSpotIndex = NextOpenSpace(vehicles);
 
         if (availableSpotIndex == -1)
@@ -146,12 +212,42 @@ public class Garage<T> where T : Vehicle
                 "The garage is full.");
         }
 
-        vehicles[availableSpotIndex] = vehicle;
+        return Park(vehicle, availableSpotIndex+1);
+    }
 
+    public GarageOperationResult Park(T vehicle, int spot)
+    {
+        if (spot > Capacity|| spot < 1)
+            return new GarageOperationResult
+                (
+                    false,
+                    null,
+                    $"I am sorry, but there doesnt exists {spot}"
+                );
+
+        if (vehicles[spot-1] is not null)
+            return new GarageOperationResult
+                    (
+                        false,
+                        null,
+                        $"I am sorry, The spot {spot} is occupied"
+                    );
+
+        if (RegistrationExists(vehicle.RegistrationNumber))
+        {
+            return new GarageOperationResult(
+                false,
+                null,
+                $"A vehicle with registration number " +
+                $"{vehicle.RegistrationNumber} is already parked.");
+        }
+
+        vehicles[spot - 1] = vehicle;
         return new GarageOperationResult(
             true,
-            availableSpotIndex,
-            $"Vehicle parked at spot {availableSpotIndex + 1}.");
+            spot-1,
+            $"Vehcile {vehicle.RegistrationNumber} parked at sport {spot}"
+            );
     }
 
     private static int NextOpenSpace(T?[] vehicles)
@@ -161,30 +257,12 @@ public class Garage<T> where T : Vehicle
             vehicle => vehicle is null);
     }
 
-    public IEnumerable<(int SpotIndex, T Vehicle)>
-        FindVehiclesByRegistration(string registrationNumber)
-    {
-        for (int index = 0; index < vehicles.Length; index++)
-        {
-            if (vehicles[index] is T vehicle &&
-                vehicle.RegistrationNumber.Equals(
-                    registrationNumber,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                yield return (
-                    SpotIndex: index,
-                    Vehicle: vehicle
-                );
-            }
-        }
-    }
-
     public GarageOperationResult Remove(string registrationNumber)
     {
-        var matches = FindVehiclesByRegistration(
-            registrationNumber).ToList();
+        var match = FindVehicleByRegistration(
+            registrationNumber);
 
-        if (matches.Count == 0)
+        if (match is null)
         {
             return new GarageOperationResult(
                 false,
@@ -192,24 +270,13 @@ public class Garage<T> where T : Vehicle
                 "We could not find your vehicle.");
         }
 
-        if (matches.Count > 1)
-        {
-            return new GarageOperationResult(
-                false,
-                null,
-                "More than one vehicle has this registration number. " +
-                "Choose a parking spot instead.");
-        }
-
-        var match = matches[0];
-
-        vehicles[match.SpotIndex] = null;
+        vehicles[match.Value.SpotIndex] = null;
 
         return new GarageOperationResult(
             true,
-            match.SpotIndex,
-            $"Vehicle {match.Vehicle.RegistrationNumber} was removed " +
-            $"from parking spot {match.SpotIndex + 1}.");
+            match.Value.SpotIndex,
+            $"Vehicle {match.Value.Vehicle.RegistrationNumber} was removed " +
+            $"from parking spot {match.Value.SpotIndex + 1}.");
     }
 
     public GarageOperationResult RemoveAtSpot(int spotNumber)
@@ -239,99 +306,103 @@ public class Garage<T> where T : Vehicle
 
         return Remove(vehicle.RegistrationNumber);
     }
-    public IEnumerable<(int SpotNumber, T Vehicle)> ParkedVehicles
+
+    public T[] Search(
+    VehicleSearchCriteria criteria)
     {
-        get
+        int matchCount = 0;
+
+        for (int index = 0;
+             index < vehicles.Length;
+             index++)
         {
-            for (int index = 0; index < vehicles.Length; index++)
+            if (vehicles[index] is T vehicle &&
+                MatchesCriteria(vehicle, criteria))
             {
-                if (vehicles[index] is T vehicle)
-                {
-                    yield return (index + 1, vehicle);
-                }
+                matchCount++;
             }
         }
+
+        T[] matches = new T[matchCount];
+
+        int matchIndex = 0;
+
+        for (int index = 0;
+             index < vehicles.Length;
+             index++)
+        {
+            if (vehicles[index] is T vehicle &&
+                MatchesCriteria(vehicle, criteria))
+            {
+                matches[matchIndex] = vehicle;
+                matchIndex++;
+            }
+        }
+
+        return matches;
     }
 
-    public IEnumerable<(string VehicleType, Vehicle[] Vehicles)> VehiclesByType
+    private static bool MatchesCriteria(
+    T vehicle,
+    VehicleSearchCriteria criteria)
     {
-        get
+        if (criteria.RegistrationNumber is not null &&
+            !vehicle.RegistrationNumber.Equals(
+                criteria.RegistrationNumber,
+                StringComparison.OrdinalIgnoreCase))
         {
-            var groups = Vehicles
-                .GroupBy(vehicle => vehicle.GetType().Name)
-                .OrderBy(group => group.Key);
+            return false;
+        }
 
-            foreach (var group in groups)
+        if (criteria.Manufacturer is not null &&
+            !vehicle.Manufacturer.Contains(
+                criteria.Manufacturer,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (criteria.Model is not null &&
+            !vehicle.Model.Contains(
+                criteria.Model,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (criteria.ManufacturingYear is not null &&
+            vehicle.ManufacturingYear !=
+            criteria.ManufacturingYear)
+        {
+            return false;
+        }
+
+        if (criteria.Color is not null &&
+            vehicle.Color != criteria.Color)
+        {
+            return false;
+        }
+
+        if (criteria.VehicleType is not null &&
+            !criteria.VehicleType.IsInstanceOfType(vehicle))
+        {
+            return false;
+        }
+
+        if (criteria.NumberOfWheels is not null)
+        {
+            if (vehicle is not IHasWheels vehicleWithWheels)
             {
-                yield return (
-                    VehicleType: group.Key,
-                    Vehicles: group.ToArray()
-                );
+                return false;
+            }
+
+            if (vehicleWithWheels.NumberOfWheels !=
+                criteria.NumberOfWheels)
+            {
+                return false;
             }
         }
-    }
 
-    public IEnumerable<T> Search(VehicleSearchCriteria criteria)
-    {
-        foreach (T vehicle in Vehicles)
-        {
-            if (criteria.RegistrationNumber is not null &&
-                !vehicle.RegistrationNumber.Equals(
-                    criteria.RegistrationNumber,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            if (criteria.Manufacturer is not null &&
-                !vehicle.Manufacturer.Contains(
-                    criteria.Manufacturer,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            if (criteria.Model is not null &&
-                !vehicle.Model.Contains(
-                    criteria.Model,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            if (criteria.ManufacturingYear is not null &&
-                vehicle.ManufacturingYear != criteria.ManufacturingYear)
-            {
-                continue;
-            }
-
-            if (criteria.Color is not null &&
-                vehicle.Color != criteria.Color)
-            {
-                continue;
-            }
-
-            if (criteria.VehicleType is not null &&
-                !criteria.VehicleType.IsInstanceOfType(vehicle))
-            {
-                continue;
-            }
-
-            if (criteria.NumberOfWheels is not null)
-            {
-                if (vehicle is not IHasWheels vehicleWithWheels)
-                {
-                    continue;
-                }
-
-                if (vehicleWithWheels.NumberOfWheels !=
-                    criteria.NumberOfWheels)
-                {
-                    continue;
-                }
-            }
-
-            yield return vehicle;
-        }
+        return true;
     }
 }
