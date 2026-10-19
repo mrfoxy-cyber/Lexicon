@@ -56,6 +56,52 @@ public sealed class GarageActions
         vehicleTypeMenu.Show();
     }
 
+    public void ParkVehicleAtSpot()
+    {
+        if (garage.AvailableSpaces == 0)
+        {
+            Console.WriteLine("The garage is full.");
+            ConsoleInput.Pause();
+            return;
+        }
+
+        int spot = ConsoleInput.ReadInt(
+            "Choose parking spot: ",
+            minimum: 1,
+            maximum: garage.Capacity);
+
+        ConsoleMenu vehicleTypeMenu = new(
+            title: $"Choose vehicle for spot {spot}",
+            options:
+            [
+                new MenuOption(
+                "Car",
+                () => Park(vehicleCreator.CreateCar(), spot)),
+
+            new MenuOption(
+                "Motorcycle",
+                () => Park(vehicleCreator.CreateMotorcycle(), spot)),
+
+            new MenuOption(
+                "Airplane",
+                () => Park(vehicleCreator.CreateAirplane(), spot)),
+
+            new MenuOption(
+                "Bus",
+                () => Park(vehicleCreator.CreateBus(), spot)),
+
+            new MenuOption(
+                "Boat",
+                () => Park(vehicleCreator.CreateBoat(), spot)),
+
+            new MenuOption(
+                "Truck",
+                () => Park(vehicleCreator.CreateTruck(), spot))
+            ]);
+
+        vehicleTypeMenu.Show();
+    }
+
     public void ListParkedVehicles()
     {
         var parkedVehicles = garage.ParkedVehicles;
@@ -136,6 +182,15 @@ public sealed class GarageActions
     private void Park(Vehicle vehicle)
     {
         GarageOperationResult result = garage.Park(vehicle);
+
+        Console.WriteLine();
+        Console.WriteLine(result.Message);
+        ConsoleInput.Pause();
+    }
+
+    private void Park(Vehicle vehicle, int spot)
+    {
+        GarageOperationResult result = garage.Park(vehicle, spot);
 
         Console.WriteLine();
         Console.WriteLine(result.Message);

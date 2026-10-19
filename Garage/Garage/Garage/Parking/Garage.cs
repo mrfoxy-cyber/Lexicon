@@ -336,7 +336,7 @@ public class Garage<T> where T : Vehicle
         return new GarageOperationResult(
             true,
             spot-1,
-            $"Vehcile {vehicle.RegistrationNumber} parked at sport {spot}"
+            $"Vehcile {vehicle.RegistrationNumber} parked at spot {spot}"
             );
     }
 

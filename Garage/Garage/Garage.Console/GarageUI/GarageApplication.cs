@@ -127,6 +127,10 @@ public sealed class GarageApplication
                     actions.ParkVehicle),
 
                 new MenuOption(
+                    "Park vehicle to specific spot",
+                    actions.ParkVehicleAtSpot),
+
+                new MenuOption(
                     "List all parked vehicles",
                     actions.ListParkedVehicles),
 
