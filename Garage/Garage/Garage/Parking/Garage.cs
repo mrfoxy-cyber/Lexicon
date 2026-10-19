@@ -112,6 +112,96 @@ public class Garage<T> where T : Vehicle
         return false;
     }
 
+    public (int SpotNumber, T Vehicle)[]
+    ParkedVehicles
+    {
+        get
+        {
+            (int SpotNumber, T Vehicle)[] parkedVehicles =
+                new (int SpotNumber, T Vehicle)[OccupiedSpaces];
+
+            int resultIndex = 0;
+
+            for (int spotIndex = 0;
+                 spotIndex < vehicles.Length;
+                 spotIndex++)
+            {
+                if (vehicles[spotIndex] is T vehicle)
+                {
+                    parkedVehicles[resultIndex] = (
+                        SpotNumber: spotIndex + 1,
+                        Vehicle: vehicle);
+
+                    resultIndex++;
+                }
+            }
+
+            return parkedVehicles;
+        }
+    }
+
+    public (string VehicleType, T[] Vehicles)[]
+        VehiclesByType
+    {
+        get
+        {
+            T[] parkedVehicles = Vehicles;
+
+            (string VehicleType, T[] Vehicles)[] groups = [];
+
+            for (int vehicleIndex = 0;
+                 vehicleIndex < parkedVehicles.Length;
+                 vehicleIndex++)
+            {
+                T vehicle = parkedVehicles[vehicleIndex];
+
+                string vehicleType =
+                    vehicle.GetType().Name;
+
+                int groupIndex = -1;
+
+                for (int index = 0;
+                     index < groups.Length;
+                     index++)
+                {
+                    if (groups[index].VehicleType == vehicleType)
+                    {
+                        groupIndex = index;
+                        break;
+                    }
+                }
+
+                if (groupIndex == -1)
+                {
+                    Array.Resize(
+                        ref groups,
+                        groups.Length + 1);
+
+                    groups[^1] = (
+                        VehicleType: vehicleType,
+                        Vehicles: [vehicle]);
+                }
+                else
+                {
+                    T[] vehiclesInGroup =
+                        groups[groupIndex].Vehicles;
+
+                    Array.Resize(
+                        ref vehiclesInGroup,
+                        vehiclesInGroup.Length + 1);
+
+                    vehiclesInGroup[^1] = vehicle;
+
+                    groups[groupIndex] = (
+                        VehicleType: vehicleType,
+                        Vehicles: vehiclesInGroup);
+                }
+            }
+
+            return groups;
+        }
+    }
+
     public (int SpotIndex, T Vehicle)? FindVehicleByRegistration( string registrationNumber)
     {
         for (int index = 0;
