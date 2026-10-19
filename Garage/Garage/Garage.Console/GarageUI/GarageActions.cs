@@ -88,7 +88,7 @@ public sealed class GarageActions
         {
             foundVehicle = true;
             Console.WriteLine(
-                $"{group.VehicleType}: {group.Vehicles.Count}");
+                $"{group.VehicleType}: {group.Vehicles.Length}");
         }
 
         if (!foundVehicle)

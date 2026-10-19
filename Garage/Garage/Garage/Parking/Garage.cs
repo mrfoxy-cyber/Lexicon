@@ -1,7 +1,8 @@
 using Garage.Results;
-using Garage.Vehicles;
 using Garage.Search;
+using Garage.Vehicles;
 using Garage.Vehicles.Interfaces;
+using System.Xml.Linq;
 
 namespace Garage.Parking;
 
@@ -10,70 +11,119 @@ public class Garage<T> where T : Vehicle
     private readonly T?[] vehicles;
     public const int MaximumGarageCapacity = 1_000;
 
-    public Garage(
-        string name,
-        int capacity,
-        IEnumerable<T>? initialVehicles = null)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException(
-                "Garage name must not be empty.",
-                nameof(name));
-        }
-
-        if (capacity <= 0)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(capacity),
-                "Capacity must be greater than zero.");
-        }
-
-        List<T> startingVehicles =
-            initialVehicles?.ToList() ?? [];
-
-        if (startingVehicles.Count > capacity)
-        {
-            throw new ArgumentException(
-                "There are more initial vehicles than parking spots.",
-                nameof(initialVehicles));
-        }
-
-        bool hasDuplicateRegistrations = startingVehicles
-            .GroupBy(
-                vehicle => vehicle.RegistrationNumber,
-                StringComparer.OrdinalIgnoreCase)
-            .Any(group => group.Count() > 1);
-
-        if (hasDuplicateRegistrations)
-        {
-            throw new ArgumentException(
-                "Initial vehicles contain duplicate registration numbers.",
-                nameof(initialVehicles));
-        }
-
-        GarageName = name;
-        vehicles = new T?[capacity];
-
-        for (int index = 0;
-             index < startingVehicles.Count;
-             index++)
-        {
-            vehicles[index] = startingVehicles[index];
-        }
-    }
-
-
     public string GarageName { get; }
 
-    public int Capacity => vehicles.Length;
+    public int Capacity { get; private  init; }
 
     public int OccupiedSpaces =>
         vehicles.Count(vehicle => vehicle is not null);
 
     public int AvailableSpaces => Capacity - OccupiedSpaces;
 
-    public IEnumerable<T> Vehicles => vehicles.OfType<T>();
+    public Vehicle[] Vehicles => [.. vehicles.OfType<T>()];
+
+    public Garage(
+        string garageName,
+        int capacity)
+        : this(
+            garageName: garageName,
+            capacity: capacity,
+            initialVehicles: [])
+    {
+    }
+
+    public Garage(
+        string garageName,
+        T?[] vehicles)
+        : this(
+            garageName: garageName,
+            capacity: vehicles.Length,
+            initialVehicles:
+                [.. vehicles.OfType<T>()])
+    {
+    }
+
+    public Garage(
+    string garageName,
+    int capacity,
+    T[]? initialVehicles = null)
+    {
+        if (string.IsNullOrWhiteSpace(garageName))
+        {
+            throw new ArgumentException(
+                "Garage name must not be empty.",
+                nameof(garageName));
+        }
+
+        if (capacity < 1 ||
+            capacity > MaximumGarageCapacity)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(capacity),
+                $"Capacity must be between 1 and " +
+                $"{MaximumGarageCapacity}.");
+        }
+
+        T[] startingVehicles =
+            initialVehicles ?? [];
+
+        if (startingVehicles.Length > capacity)
+        {
+            throw new ArgumentException(
+                "Too many initial vehicles.",
+                nameof(initialVehicles));
+        }
+
+        this.GarageName = garageName;
+        this.Capacity = capacity;
+        this.vehicles = new T?[capacity];
+
+        Array.Copy(
+            startingVehicles,
+            this.vehicles,
+            startingVehicles.Length);
+    }
+
+
+
+    public GarageOperationResult ParkAtSpot( T vehicle, int spotNumber)
+    {
+        if (spotNumber < 1 ||
+            spotNumber > Capacity)
+        {
+            return new GarageOperationResult(
+                false,
+                null,
+                $"Parking spot must be between 1 and {Capacity}.");
+        }
+
+        if (FindVehiclesByRegistration(
+                vehicle.RegistrationNumber).Any())
+        {
+            return new GarageOperationResult(
+                false,
+                null,
+                "A vehicle with this registration number already exists.");
+        }
+
+        int spotIndex = spotNumber - 1;
+
+        if (vehicles[spotIndex] is not null)
+        {
+            return new GarageOperationResult(
+                false,
+                spotIndex,
+                $"Parking spot {spotNumber} is already occupied.");
+        }
+
+        vehicles[spotIndex] = vehicle;
+
+        return new GarageOperationResult(
+            true,
+            spotIndex,
+            $"Vehicle parked at spot {spotNumber}.");
+    }
+
 
     public GarageOperationResult Park(T vehicle)
     {
@@ -176,7 +226,7 @@ public class Garage<T> where T : Vehicle
         }
     }
 
-    public IEnumerable<(string VehicleType, IReadOnlyList<T> Vehicles)> VehiclesByType
+    public IEnumerable<(string VehicleType, Vehicle[] Vehicles)> VehiclesByType
     {
         get
         {
@@ -188,7 +238,7 @@ public class Garage<T> where T : Vehicle
             {
                 yield return (
                     VehicleType: group.Key,
-                    Vehicles: group.ToList()
+                    Vehicles: group.ToArray()
                 );
             }
         }

@@ -22,7 +22,7 @@ public static class CarFactory
         BodyType bodyType,
         int numberOfDoors,
         int numberOfSeats,
-        List<Engine>? engines = null)
+        Engine[]? engines = null)
     {
         return new Car
         {

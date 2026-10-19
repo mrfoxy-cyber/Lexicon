@@ -6,13 +6,12 @@ using VehicleGarage =
 
 try
 {
-    List<Vehicle> startingVehicles =
+    Vehicle[] startingVehicles =
         SeedData.LoadVehicles();
 
     VehicleGarage startingGarage = new(
-        name: "Lexicon Garage",
-        capacity: 20,
-        initialVehicles: startingVehicles);
+       garageName: "Lexicon Garage",
+        vehicles: startingVehicles);
 
     GarageApplication application = new(
         initialGarages: [startingGarage]);

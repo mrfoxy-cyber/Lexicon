@@ -22,7 +22,7 @@ public static class TruckFactory
         int numberOfWheels,
         int numberOfAxles,
         double maximumLoadKg,
-        IEnumerable<Engine>? engines = null)
+        Engine[]? engines = null)
     {
         return new Truck
         {
@@ -45,7 +45,7 @@ public static class TruckFactory
                 NumberOfWheels = numberOfWheels,
                 NumberOfAxles = numberOfAxles,
                 MaximumLoadKg = maximumLoadKg,
-                Engines = engines?.ToList() ?? []
+                Engines = engines ?? []
             }
         };
     }

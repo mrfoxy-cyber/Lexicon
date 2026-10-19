@@ -7,7 +7,7 @@ namespace Garage.ConsoleApp.Data;
 
 public static class SeedData
 {
-    public static List<Vehicle> LoadVehicles(string? filePath = null)
+    public static Vehicle[] LoadVehicles(string? filePath = null)
     {
         // same as if (filePath is null)
         filePath ??= Path.Combine(
@@ -32,34 +32,13 @@ public static class SeedData
         string json = File.ReadAllText(filePath);
 
 
-        /* fancy way to say 
-
-                List<SeedVehicleDto>? result =
-                    JsonSerializer.Deserialize<List<SeedVehicleDto>>(
-                        json,
-                        options);
-
-                List<SeedVehicleDto> seedVehicles;
-
-                if (result is null)
-                {
-                    seedVehicles = new List<SeedVehicleDto>();
-                }
-                else
-                {
-                    seedVehicles = result;
-                }
-}
-
-        */
-        List<SeedVehicleDto> seedVehicles =
-            JsonSerializer.Deserialize<List<SeedVehicleDto>>(
+        SeedVehicleDto[] seedVehicles =
+            JsonSerializer.Deserialize<SeedVehicleDto[]>(
                 json,
                 options) ?? [];
 
-        return seedVehicles
-            .Select(CreateVehicle)
-            .ToList();
+        return seedVehicles.Select(CreateVehicle)
+            .ToArray(); ;
     }
 
     private static Vehicle CreateVehicle(SeedVehicleDto seed)

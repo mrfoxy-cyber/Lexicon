@@ -26,7 +26,7 @@ public static class BoatFactory
         bool hasCabin,
         int cabinPassengerSeatCount,
         int cabinCrewSeatCount,
-        IEnumerable<Engine>? engines = null)
+        Engine[]? engines = null)
     {
         Cabin? cabin = hasCabin
             ? new Cabin
@@ -53,7 +53,7 @@ public static class BoatFactory
                 PassengerCapacity = passengerCapacity,
                 DriverSeats = driverSeats,
                 Cabin = cabin,
-                Engines = engines?.ToList() ?? []
+                Engines = engines ?? []
             }
         };
     }

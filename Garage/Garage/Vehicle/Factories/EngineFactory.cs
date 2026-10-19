@@ -11,6 +11,7 @@ namespace Garage.Factories;
 public static class EngineFactory
 {
     public static InlineEngine CreateInlineEngine(
+        string serialNumber,
         string model,
         FuelType fuelType,
         int horsePower,
@@ -19,6 +20,7 @@ public static class EngineFactory
     {
         return new InlineEngine
         {
+            SerialNumber= serialNumber,
             Model = model,
             Specification = new PistonEngineSpecification
             {
@@ -31,6 +33,7 @@ public static class EngineFactory
     }
 
     public static VEngine CreateVEngine(
+        string serialNumber,
         string model,
         FuelType fuelType,
         int horsePower,
@@ -39,6 +42,7 @@ public static class EngineFactory
     {
         return new VEngine
         {
+            SerialNumber= serialNumber,
             Model = model,
             Specification = new PistonEngineSpecification
             {
@@ -51,6 +55,7 @@ public static class EngineFactory
     }
 
     public static FlatEngine CreateFlatEngine(
+        string serialNumber,
         string model,
         FuelType fuelType,
         int horsePower,
@@ -59,6 +64,7 @@ public static class EngineFactory
     {
         return new FlatEngine
         {
+            SerialNumber= serialNumber,
             Model = model,
             Specification = new PistonEngineSpecification
             {
@@ -71,6 +77,7 @@ public static class EngineFactory
     }
 
     public static RotaryEngine CreateRotaryEngine(
+        string serialNumber,
         string model,
         FuelType fuelType,
         int horsePower,
@@ -79,6 +86,7 @@ public static class EngineFactory
     {
         return new RotaryEngine
         {
+            SerialNumber = serialNumber,
             Model = model,
             Specification = new RotaryEngineSpecification
             {
@@ -91,12 +99,14 @@ public static class EngineFactory
     }
 
     public static ElectricMotor CreateElectricMotor(
+        string serialNumber,
         string model,
         double powerKw,
         double voltage)
     {
         return new ElectricMotor
         {
+            SerialNumber = serialNumber,
             Model = model,
             Specification = new ElectricEngineSpecification
             {
@@ -107,6 +117,7 @@ public static class EngineFactory
     }
 
     public static SteamEngine CreateSteamEngine(
+        string serialNumber,
         string model,
         FuelType fuelType,
         int horsePower,
@@ -114,6 +125,7 @@ public static class EngineFactory
     {
         return new SteamEngine
         {
+            SerialNumber = serialNumber,
             Model = model,
             Specification = new SteamEngineSpecification
             {
@@ -125,12 +137,14 @@ public static class EngineFactory
     }
 
     public static TurbojetEngine CreateTurbojetEngine(
+        string serialNumber,
         string model,
         FuelType fuelType,
         double thrustKn)
     {
         return new TurbojetEngine
         {
+            SerialNumber = serialNumber,
             Model = model,
             Specification = new TurbineEngineSpecification
             {
@@ -141,6 +155,7 @@ public static class EngineFactory
     }
 
     public static TurbofanEngine CreateTurbofanEngine(
+        string serialNumber,
         string model,
         FuelType fuelType,
         double thrustKn,
@@ -148,6 +163,7 @@ public static class EngineFactory
     {
         return new TurbofanEngine
         {
+            SerialNumber = serialNumber,
             Model = model,
             Specification = new TurbofanEngineSpecification
             {
@@ -159,6 +175,7 @@ public static class EngineFactory
     }
 
     public static TurbopropEngine CreateTurbopropEngine(
+        string serialNumber,
         string model,
         FuelType fuelType,
         double thrustKn,
@@ -166,6 +183,7 @@ public static class EngineFactory
     {
         return new TurbopropEngine
         {
+            SerialNumber = serialNumber,
             Model = model,
             Specification = new TurbopropEngineSpecification
             {
@@ -177,6 +195,7 @@ public static class EngineFactory
     }
 
     public static TurboshaftEngine CreateTurboshaftEngine(
+        string serialNumber,
         string model,
         FuelType fuelType,
         double thrustKn,
@@ -184,6 +203,7 @@ public static class EngineFactory
     {
         return new TurboshaftEngine
         {
+            SerialNumber = serialNumber,
             Model = model,
             Specification = new TurboshaftEngineSpecification
             {

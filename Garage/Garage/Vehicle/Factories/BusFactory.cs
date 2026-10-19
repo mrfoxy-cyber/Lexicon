@@ -24,7 +24,7 @@ public static class BusFactory
         int passengerSeatCount,
         int standingPassengerCapacity,
         int driverSeatCount,
-        IEnumerable<Engine>? engines = null)
+        Engine[]? engines = null)
     {
         return new Bus
         {
@@ -46,7 +46,7 @@ public static class BusFactory
                     PassengerSeatCount = passengerSeatCount,
                     CrewSeatCount = driverSeatCount
                 },
-                Engines = engines?.ToList() ?? []
+                Engines = engines ?? []
             }
         };
     }

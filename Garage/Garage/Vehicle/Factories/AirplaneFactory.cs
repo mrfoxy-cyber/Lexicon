@@ -25,7 +25,7 @@ public static class AirplaneFactory
         int pilotSeatCount,
         bool hasDualControls,
         double maximumAltitudeMeters,
-        IEnumerable<Engine>? engines = null)
+        Engine[]? engines = null)
     {
         Cockpit? cockpit = pilotSeatCount > 0
             ? new Cockpit
@@ -56,7 +56,7 @@ public static class AirplaneFactory
                     PassengerSeatCount = passengerSeatCount,
                     CrewSeatCount = crewSeatCount
                 },
-                Engines = engines?.ToList() ?? []
+                Engines = engines ?? []
             }
         };
     }

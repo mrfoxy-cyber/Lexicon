@@ -24,7 +24,7 @@ public static class MotorcycleFactory
         int numberOfWheels,
         int passengerCapacity,
         int driverSeats,
-        IEnumerable<Engine>? engines = null)
+        Engine[]? engines = null)
     {
         return new Motorcycle
         {
@@ -43,7 +43,7 @@ public static class MotorcycleFactory
                 NumberOfWheels = numberOfWheels,
                 PassengerCapacity = passengerCapacity,
                 DriverSeats = driverSeats,
-                Engines = engines?.ToList() ?? []
+                Engines = engines ?? []
             }
         };
     }

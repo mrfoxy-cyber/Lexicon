@@ -80,7 +80,7 @@ public sealed class GarageApplication
             maximum: int.MaxValue);
 
         VehicleGarage garage = new(
-            name: name,
+            garageName: name,
             capacity: capacity);
 
         garages.Add(garage);
@@ -95,6 +95,7 @@ public sealed class GarageApplication
             title: garage.GarageName,
             options:
             [
+
 
                 new MenuOption(
                     "Park vehicle",
