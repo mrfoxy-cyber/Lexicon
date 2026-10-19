@@ -2,18 +2,18 @@
 
 public sealed class ConsoleMenu
 {
-    private readonly IReadOnlyList<MenuOption> options;
+    private readonly MenuOption[] options;
 
     public string Title { get; }
     public string BackOptionText { get; }
 
     public ConsoleMenu(
         string title,
-        IEnumerable<MenuOption> options,
+        MenuOption[] options,
         string backOptionText = "Back")
     {
         Title = title;
-        this.options = options.ToList();
+        this.options = options;
         BackOptionText = backOptionText;
     }
 
@@ -26,7 +26,8 @@ public sealed class ConsoleMenu
             int choice = ConsoleInput.ReadInt(
                 "Choose: ",
                 minimum: 0,
-                maximum: options.Count);
+                maximum: options.Length
+                );
 
             if (choice == 0)
             {
@@ -45,7 +46,7 @@ public sealed class ConsoleMenu
         Console.WriteLine($"=== {Title} ===");
         Console.WriteLine();
 
-        for (int index = 0; index < options.Count; index++)
+        for (int index = 0; index < options.Length; index++)
         {
             Console.WriteLine(
                 $"{index + 1}. {options[index].Text}");

@@ -1,4 +1,5 @@
 using Garage.ConsoleApp.ConsoleFramework;
+using Garage.Parking;
 using Garage.Vehicles;
 using VehicleGarage = Garage.Parking.Garage<Garage.Vehicles.Vehicle>;
 
@@ -6,12 +7,21 @@ namespace Garage.ConsoleApp.GarageUI;
 
 public sealed class GarageApplication
 {
-    private readonly List<VehicleGarage> garages;
+    private VehicleGarage[] garages;
+
+    public VehicleGarage[] Garages =>
+        [.. garages];
 
     public GarageApplication(
-        IEnumerable<VehicleGarage> initialGarages)
+        VehicleGarage[] initialGarages)
     {
-        garages = initialGarages.ToList();
+        garages = [.. initialGarages];
+    }
+
+    private void AddGarage(
+        VehicleGarage garage)
+    {
+        garages = [.. garages, garage];
     }
 
     public void Run()
@@ -35,19 +45,28 @@ public sealed class GarageApplication
 
     private void ChooseGarage()
     {
-        if (garages.Count == 0)
+        if (garages.Length == 0)
         {
             Console.WriteLine("There are no garages yet.");
             ConsoleInput.Pause();
             return;
         }
 
-        List<MenuOption> garageOptions = garages
-            .Select(garage => new MenuOption(
-                $"{garage.GarageName} " +
-                $"({garage.OccupiedSpaces}/{garage.Capacity})",
-                () => OpenGarage(garage)))
-            .ToList();
+        MenuOption[] garageOptions = new MenuOption[garages.Length];
+
+        for(int i=0; i < garages.Length; i++)
+        {
+            VehicleGarage selectedGarage = garages[i];
+
+            var menuOption= new MenuOption(
+                $"{garages[i].GarageName} ({garages[i].OccupiedSpaces}/{garages[i].Capacity})",
+                () => OpenGarage(selectedGarage)
+                );
+
+            garageOptions[i] = menuOption;
+        }
+
+
 
         ConsoleMenu garageMenu = new(
             title: "Choose garage",
@@ -83,7 +102,7 @@ public sealed class GarageApplication
             garageName: name,
             capacity: capacity);
 
-        garages.Add(garage);
+        AddGarage(garage);
         OpenGarage(garage);
     }
 
@@ -95,8 +114,6 @@ public sealed class GarageApplication
             title: garage.GarageName,
             options:
             [
-
-
                 new MenuOption(
                     "Park vehicle",
                     actions.ParkVehicle),

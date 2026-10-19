@@ -105,20 +105,16 @@ public sealed class GarageActions
             ConsoleInput.ReadRequiredString(
                 "Registration number: ");
 
-        var matches = garage
-            .FindVehiclesByRegistration(registrationNumber)
-            .ToList();
+        var match = garage
+            .FindVehicleByRegistration(registrationNumber);
 
-        if (matches.Count == 0)
+        if (match is null)
         {
             Console.WriteLine("No vehicle was found.");
         }
         else
         {
-            foreach (var match in matches)
-            {
-                PrintVehicle(match.SpotIndex + 1, match.Vehicle);
-            }
+            PrintVehicle(match.Value.SpotIndex + 1, match.Value.Vehicle);  
         }
 
         ConsoleInput.Pause();

@@ -11,7 +11,8 @@ try
 
     VehicleGarage startingGarage = new(
        garageName: "Lexicon Garage",
-        vehicles: startingVehicles);
+       capacity: 20,
+        initialVehicles: startingVehicles);
 
     GarageApplication application = new(
         initialGarages: [startingGarage]);
