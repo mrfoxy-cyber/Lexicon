@@ -80,10 +80,18 @@ public sealed class GarageApplication
         string name = ConsoleInput.ReadRequiredString(
             "Garage name: ");
 
-        bool nameAlreadyExists = garages.Any(garage =>
-            garage.GarageName.Equals(
+        bool nameAlreadyExists = false;
+
+        for (int i = 0; i < garages.Length; i++)
+        {
+            if (garages[i].GarageName.Equals(
                 name,
-                StringComparison.OrdinalIgnoreCase));
+                StringComparison.OrdinalIgnoreCase))
+            {
+                nameAlreadyExists = true;
+                break;
+            }
+        }
 
         if (nameAlreadyExists)
         {

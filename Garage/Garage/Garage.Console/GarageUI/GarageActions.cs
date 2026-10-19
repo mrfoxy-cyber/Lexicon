@@ -58,9 +58,9 @@ public sealed class GarageActions
 
     public void ListParkedVehicles()
     {
-        var parkedVehicles = garage.ParkedVehicles.ToList();
+        var parkedVehicles = garage.ParkedVehicles;
 
-        if (parkedVehicles.Count == 0)
+        if (parkedVehicles.Length == 0)
         {
             Console.WriteLine("The garage is empty.");
             ConsoleInput.Pause();

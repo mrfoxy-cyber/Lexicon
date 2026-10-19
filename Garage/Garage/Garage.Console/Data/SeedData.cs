@@ -37,8 +37,15 @@ public static class SeedData
                 json,
                 options) ?? [];
 
-        return seedVehicles.Select(CreateVehicle)
-            .ToArray(); ;
+        Vehicle[] vehicles =
+    new Vehicle[seedVehicles.Length];
+
+        for (int i = 0; i < seedVehicles.Length; i++)
+        {
+            vehicles[i] = CreateVehicle(seedVehicles[i]);
+        }
+
+        return vehicles;
     }
 
     private static Vehicle CreateVehicle(SeedVehicleDto seed)
