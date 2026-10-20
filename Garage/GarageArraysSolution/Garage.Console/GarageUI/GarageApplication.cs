@@ -21,13 +21,20 @@ public sealed class GarageApplication
         garages = [.. initialGarages];
         createdVehicles = new CreatedVehicleStore(
             initialCreatedVehicles);
-        vehicleCreator = new VehicleCreator(createdVehicles);
+        vehicleCreator = new VehicleCreator(
+            createdVehicles,
+            GetGarages);
     }
 
     private void AddGarage(
         VehicleGarage garage)
     {
         garages = [.. garages, garage];
+    }
+
+    private VehicleGarage[] GetGarages()
+    {
+        return [.. garages];
     }
 
     public void Run()
@@ -126,7 +133,10 @@ public sealed class GarageApplication
 
     private void OpenGarage(VehicleGarage garage)
     {
-        GarageActions actions = new(garage, createdVehicles);
+        GarageActions actions = new(
+            garage,
+            createdVehicles,
+            GetGarages);
 
         ConsoleMenu vehicleMenu = new(
             title: garage.GarageName,

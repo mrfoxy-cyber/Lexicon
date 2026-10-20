@@ -5,6 +5,7 @@ namespace Garage.ConsoleApp.GarageUI;
 
 public delegate Vehicle VehicleFactory();
 public delegate void EngineCreatedHandler(Engine engine);
+public delegate global::Garage.Parking.Garage[] GarageProvider();
 
 public delegate string? TextValueGetter();
 public delegate void TextValueSetter(string value);

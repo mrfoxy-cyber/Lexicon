@@ -10,13 +10,16 @@ public sealed class GarageActions
 {
     private readonly VehicleGarage garage;
     private readonly CreatedVehicleStore createdVehicles;
+    private readonly GarageProvider garageProvider;
 
     public GarageActions(
         VehicleGarage garage,
-        CreatedVehicleStore createdVehicles)
+        CreatedVehicleStore createdVehicles,
+        GarageProvider garageProvider)
     {
         this.garage = garage;
         this.createdVehicles = createdVehicles;
+        this.garageProvider = garageProvider;
     }
 
     public void ParkVehicle()
@@ -246,12 +249,34 @@ public sealed class GarageActions
 
     private Vehicle? SelectCreatedVehicle()
     {
-        Vehicle[] vehicles = createdVehicles.Vehicles;
+        Vehicle[] created = createdVehicles.Vehicles;
+        VehicleGarage[] garages = garageProvider();
+        int availableCount = 0;
+
+        for (int index = 0; index < created.Length; index++)
+        {
+            if (!VehicleParkingStatus.IsParked(created[index], garages))
+            {
+                availableCount++;
+            }
+        }
+
+        Vehicle[] vehicles = new Vehicle[availableCount];
+        int availableIndex = 0;
+
+        for (int index = 0; index < created.Length; index++)
+        {
+            if (!VehicleParkingStatus.IsParked(created[index], garages))
+            {
+                vehicles[availableIndex] = created[index];
+                availableIndex++;
+            }
+        }
 
         if (vehicles.Length == 0)
         {
             Console.WriteLine(
-                "There are no created vehicles available to park.");
+                "There are no available created vehicles to park.");
             ConsoleInput.Pause();
             return null;
         }

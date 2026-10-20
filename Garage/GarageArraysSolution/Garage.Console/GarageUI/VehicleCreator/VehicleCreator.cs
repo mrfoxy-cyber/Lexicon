@@ -9,6 +9,7 @@ namespace Garage.ConsoleApp.GarageUI;
 public sealed class VehicleCreator
 {
     private readonly CreatedVehicleStore createdVehicles;
+    private readonly GarageProvider garageProvider;
     private readonly VehicleActions vehicleActions = new();
     private readonly EngineCreator engineCreator = new();
 
@@ -19,9 +20,12 @@ public sealed class VehicleCreator
     private readonly BoatDraft boatDraft = new();
     private readonly TruckDraft truckDraft = new();
 
-    public VehicleCreator(CreatedVehicleStore createdVehicles)
+    public VehicleCreator(
+        CreatedVehicleStore createdVehicles,
+        GarageProvider garageProvider)
     {
         this.createdVehicles = createdVehicles;
+        this.garageProvider = garageProvider;
     }
 
     public void ShowMenu()
@@ -306,6 +310,7 @@ public sealed class VehicleCreator
     private void ListCreatedVehicles()
     {
         Vehicle[] vehicles = createdVehicles.Vehicles;
+        global::Garage.Parking.Garage[] garages = garageProvider();
 
         if (vehicles.Length == 0)
         {
@@ -317,8 +322,15 @@ public sealed class VehicleCreator
         for (int index = 0; index < vehicles.Length; index++)
         {
             Vehicle vehicle = vehicles[index];
+            string status = VehicleParkingStatus.IsParked(
+                vehicle,
+                garages)
+                ? "[PARKED]"
+                : "[AVAILABLE]";
+
             Console.WriteLine(
-                $"{index + 1}. {vehicle.GetType().Name}, " +
+                $"{index + 1}. {status,-11} " +
+                $"{vehicle.GetType().Name}, " +
                 $"{vehicle.Manufacturer} {vehicle.Model}, " +
                 $"{vehicle.RegistrationNumber}");
         }
