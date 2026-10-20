@@ -27,4 +27,9 @@ public sealed class MenuOption
     {
         action();
     }
+
+    public override string ToString()
+    {
+        return Text;
+    }
 }

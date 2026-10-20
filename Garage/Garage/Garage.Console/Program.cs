@@ -1,5 +1,6 @@
 using Garage.ConsoleApp.Data;
 using Garage.ConsoleApp.GarageUI;
+using Garage.ConsoleApp.Logging;
 using Garage.Vehicles;
 using VehicleGarage =
     Garage.Parking.Garage<Garage.Vehicles.Vehicle>;
@@ -21,6 +22,7 @@ try
         initialGarages: [startingGarage],
         initialCreatedVehicles: createdVehicles);
 
+
     application.Run();
 
     Console.WriteLine("Goodbye!");
@@ -32,4 +34,13 @@ catch (Exception exception) when (
 {
     Console.WriteLine(
         $"The garage could not be started: {exception.Message}");
+}
+catch (Exception exception)
+{
+    ErrorLogger.TryLog(exception);
+
+    Console.WriteLine(
+        "An unexpected error occurred.");
+
+    Environment.ExitCode = 1;
 }

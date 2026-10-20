@@ -217,6 +217,8 @@ public sealed class VehicleCreator
 
         Vehicle vehicle;
 
+        //Domain magic happens here, we catch error from domain here
+
         try
         {
             vehicle = factory(draft);

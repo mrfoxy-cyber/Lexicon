@@ -1,4 +1,6 @@
-﻿namespace Garage.ConsoleApp.ConsoleFramework;
+﻿using Garage.ConsoleApp.Logging;
+
+namespace Garage.ConsoleApp.ConsoleFramework;
 
 public sealed class ConsoleMenu
 {
@@ -19,6 +21,7 @@ public sealed class ConsoleMenu
 
     public void Show()
     {
+
         while (true)
         {
             Display();
@@ -35,7 +38,30 @@ public sealed class ConsoleMenu
             }
 
             Console.Clear();
-            options[choice - 1].Execute();
+            MenuOption selectedOption = options[choice - 1];
+
+            // Catch and log unexpected action errors so the menu can continue.
+            try
+            {
+                selectedOption.Execute();
+
+            }
+            catch (Exception exception)
+            {
+                bool wasLogged = ErrorLogger.TryLog(
+                    exception,
+                    operation: $"{Title} -> {selectedOption.Text}",
+                    relatedObject: selectedOption);
+
+                Console.WriteLine(
+                    "Something unexpected went wrong.");
+
+                Console.WriteLine(wasLogged
+                    ? "The error was written to the log."
+                    : "The error could not be written to the log.");
+
+                ConsoleInput.Pause();
+            }
         }
     }
 

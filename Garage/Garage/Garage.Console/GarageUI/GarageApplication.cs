@@ -46,7 +46,12 @@ public sealed class GarageApplication
 
                 new MenuOption(
                     "Create garage",
-                    CreateGarage)
+                    CreateGarage),
+
+                new MenuOption(
+                    "Test error logger",
+                    () => throw new InvalidOperationException(
+                        "This is a test exception"))
             ],
             backOptionText: "Exit");
 
