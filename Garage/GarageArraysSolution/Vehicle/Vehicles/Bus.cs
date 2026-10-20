@@ -11,7 +11,6 @@ namespace Garage.Vehicles
     {
         public required BusSpecification Specification { get; init; }
         public override VehicleSpecification SpecificationDetails => Specification;
-        //ChassisNumber
         public required string Vin { get; init; }
 
      
