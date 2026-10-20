@@ -44,7 +44,11 @@ public abstract class VehicleDraft
             ? "Not set"
             : $"{LengthMeters} x {WidthMeters} x {HeightMeters} m";
 
-    public string EnginesText => $"{Engines.Length} engine(s)";
+    public string EnginesText => engines.Length == 0
+        ? "No engine"
+        : engines.Length == 1
+            ? "1 engine"
+            : $"{engines.Length} engines";
 
     public void AddEngines(IEnumerable<Engine> newEngines)
     {

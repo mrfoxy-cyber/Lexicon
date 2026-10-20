@@ -28,6 +28,15 @@ public static class BoatFactory
         int cabinCrewSeatCount,
         Engine[]? engines = null)
     {
+        if (hasCabin &&
+            cabinPassengerSeatCount > passengerCapacity)
+        {
+            throw new ArgumentException(
+                "Cabin passenger seats cannot exceed " +
+                "the boat's passenger capacity.",
+                nameof(cabinPassengerSeatCount));
+        }
+
         Cabin? cabin = hasCabin
             ? new Cabin
             {

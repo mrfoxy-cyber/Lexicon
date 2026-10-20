@@ -26,7 +26,6 @@ public sealed class AirplaneDraft : VehicleDraft
         if (PilotSeats is null) missing.Add("pilot seats");
         if (HasDualControls is null) missing.Add("dual controls choice");
         if (MaximumAltitudeMeters is null) missing.Add("maximum altitude");
-        if (Engines.Length == 0) missing.Add("engine");
         return [.. missing];
     }
 

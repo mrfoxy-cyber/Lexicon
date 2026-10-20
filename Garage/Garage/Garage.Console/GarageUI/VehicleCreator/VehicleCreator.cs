@@ -215,7 +215,21 @@ public sealed class VehicleCreator
             return;
         }
 
-        Vehicle vehicle = factory(draft);
+        Vehicle vehicle;
+
+        try
+        {
+            vehicle = factory(draft);
+        }
+        catch (ArgumentException exception)
+        {
+            Console.WriteLine(
+                VehicleCreatorResult.Failed(
+                    exception.Message).Message);
+            ConsoleInput.Pause();
+            return;
+        }
+
         createdVehicles.Add(vehicle);
         Console.WriteLine(VehicleCreatorResult.Completed(vehicle).Message);
         draft.Clear();

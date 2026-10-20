@@ -14,7 +14,6 @@ public sealed class TruckDraft : VehicleDraft
         if (NumberOfWheels is null) missing.Add("number of wheels");
         if (NumberOfAxles is null) missing.Add("number of axles");
         if (MaximumLoadKg is null) missing.Add("maximum load");
-        if (Engines.Length == 0) missing.Add("engine");
         return [.. missing];
     }
 

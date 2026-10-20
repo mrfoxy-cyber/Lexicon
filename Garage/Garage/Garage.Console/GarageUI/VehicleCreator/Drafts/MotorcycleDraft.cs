@@ -20,7 +20,6 @@ public sealed class MotorcycleDraft : VehicleDraft
         if (NumberOfWheels is null) missing.Add("number of wheels");
         if (PassengerCapacity is null) missing.Add("passenger capacity");
         if (DriverSeats is null) missing.Add("driver seats");
-        if (Engines.Length == 0) missing.Add("engine");
         return [.. missing];
     }
 

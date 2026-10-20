@@ -29,7 +29,6 @@ public sealed class BoatDraft : VehicleDraft
             if (CabinCrewSeats is null) missing.Add("cabin crew seats");
         }
 
-        if (Engines.Length == 0) missing.Add("engine");
         return [.. missing];
     }
 

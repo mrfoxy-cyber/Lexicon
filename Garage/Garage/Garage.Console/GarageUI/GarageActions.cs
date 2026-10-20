@@ -230,9 +230,6 @@ public sealed class GarageActions
     {
         GarageOperationResult result = garage.Park(vehicle);
 
-        if (result.Success)
-            createdVehicles.Remove(vehicle);
-
         Console.WriteLine();
         Console.WriteLine(result.Message);
         ConsoleInput.Pause();
@@ -241,9 +238,6 @@ public sealed class GarageActions
     private void Park(Vehicle vehicle, int spot)
     {
         GarageOperationResult result = garage.Park(vehicle, spot);
-
-        if (result.Success)
-            createdVehicles.Remove(vehicle);
 
         Console.WriteLine();
         Console.WriteLine(result.Message);

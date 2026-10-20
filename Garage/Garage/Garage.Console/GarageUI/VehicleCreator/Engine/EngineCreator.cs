@@ -12,7 +12,8 @@ public sealed class EngineCreator
     {
         EngineKind? kind =
             ConsoleInput.ReadEnumOrCancel<EngineKind>(
-                "Choose engine type:");
+                "Choose engine type:",
+                cancelOptionText: "No engine");
 
         if (kind is null)
             return;

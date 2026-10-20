@@ -204,13 +204,15 @@ public static class ConsoleInput
         Console.ReadLine();
     }
 
-    public static TEnum? ReadEnumOrCancel<TEnum>(string prompt)
-    where TEnum : struct, Enum
+    public static TEnum? ReadEnumOrCancel<TEnum>(
+        string prompt,
+        string cancelOptionText = "Cancel")
+        where TEnum : struct, Enum
     {
         TEnum[] values = Enum.GetValues<TEnum>();
 
         Console.WriteLine(prompt);
-        Console.WriteLine("0. Cancel");
+        Console.WriteLine($"0. {cancelOptionText}");
 
         for (int index = 0; index < values.Length; index++)
         {

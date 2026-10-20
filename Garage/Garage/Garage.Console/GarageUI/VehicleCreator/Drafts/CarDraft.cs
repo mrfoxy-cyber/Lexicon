@@ -36,9 +36,6 @@ public sealed class CarDraft : VehicleDraft
         if (NumberOfSeats is null)
             missing.Add("number of seats");
 
-        if (Engines.Length == 0)
-            missing.Add("engine");
-
         return [.. missing];
     }
 

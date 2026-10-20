@@ -18,7 +18,6 @@ public sealed class BusDraft : VehicleDraft
         if (PassengerSeats is null) missing.Add("passenger seats");
         if (StandingPassengerCapacity is null) missing.Add("standing passenger capacity");
         if (DriverSeats is null) missing.Add("driver seats");
-        if (Engines.Length == 0) missing.Add("engine");
         return [.. missing];
     }
 
