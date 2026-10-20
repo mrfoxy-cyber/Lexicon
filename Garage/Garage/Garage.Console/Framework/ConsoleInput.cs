@@ -203,4 +203,27 @@ public static class ConsoleInput
         Console.WriteLine("Press Enter to continue.");
         Console.ReadLine();
     }
+
+    public static TEnum? ReadEnumOrCancel<TEnum>(string prompt)
+    where TEnum : struct, Enum
+    {
+        TEnum[] values = Enum.GetValues<TEnum>();
+
+        Console.WriteLine(prompt);
+        Console.WriteLine("0. Cancel");
+
+        for (int index = 0; index < values.Length; index++)
+        {
+            Console.WriteLine($"{index + 1}. {values[index]}");
+        }
+
+        int choice = ReadInt(
+            "Choose: ",
+            minimum: 0,
+            maximum: values.Length);
+
+        return choice == 0
+            ? null
+            : values[choice - 1];
+    }
 }

@@ -6,7 +6,7 @@ using Garage.Vehicles.Types;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class VehicleCreator
+public sealed class VehicleActions
 {
     public Car CreateCar()
     {
@@ -224,6 +224,21 @@ public sealed class VehicleCreator
             numberOfWheels,
             numberOfAxles,
             maximumLoadKg);
+    }
+
+    public static void PrintVehicle(
+        int spotNumber,
+        Vehicle vehicle)
+    {
+        Console.WriteLine($"Spot: {spotNumber}");
+        Console.WriteLine($"Type: {vehicle.GetType().Name}");
+        Console.WriteLine(
+            $"Registration number: {vehicle.RegistrationNumber}");
+        Console.WriteLine(
+            $"Vehicle: {vehicle.Manufacturer} {vehicle.Model}");
+        Console.WriteLine($"Year: {vehicle.ManufacturingYear}");
+        Console.WriteLine($"Color: {vehicle.Color}");
+        Console.WriteLine();
     }
 
     private static VehicleInput ReadVehicleInput()

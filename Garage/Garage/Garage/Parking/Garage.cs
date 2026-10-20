@@ -397,6 +397,10 @@ public class Garage<T> where T : Vehicle
         return Remove(vehicle.RegistrationNumber);
     }
 
+
+    // Arrays have a fixed size, so the first loop counts the matches.
+    // This lets us create an array of the exact required size.
+    // The second loop then fills that array with the matching vehicles.
     public T[] Search(
     VehicleSearchCriteria criteria)
     {

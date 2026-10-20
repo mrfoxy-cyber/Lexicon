@@ -25,36 +25,18 @@ public sealed class GarageActions
             return;
         }
 
-        ConsoleMenu vehicleTypeMenu = new(
-            title: "Choose vehicle type",
-            options:
-            [
-                new MenuOption(
-                    "Car",
-                    () => Park(vehicleCreator.CreateCar())),
+        VehicleCreatorResult result =
+            vehicleCreator.CreateVehicle();
 
-                new MenuOption(
-                    "Motorcycle",
-                    () => Park(vehicleCreator.CreateMotorcycle())),
+        if (!result.Success || result.Vehicle is null)
+        {
+            Console.WriteLine(result.Message);
+            ConsoleInput.Pause();
+            return;
+        }
 
-                new MenuOption(
-                    "Airplane",
-                    () => Park(vehicleCreator.CreateAirplane())),
-
-                new MenuOption(
-                    "Bus",
-                    () => Park(vehicleCreator.CreateBus())),
-
-                new MenuOption(
-                    "Boat",
-                    () => Park(vehicleCreator.CreateBoat())),
-
-                new MenuOption(
-                    "Truck",
-                    () => Park(vehicleCreator.CreateTruck()))
-            ]);
-
-        vehicleTypeMenu.Show();
+        Console.WriteLine(result.Message);
+        Park(result.Vehicle);
     }
 
     public void ParkVehicleAtSpot()
@@ -71,36 +53,18 @@ public sealed class GarageActions
             minimum: 1,
             maximum: garage.Capacity);
 
-        ConsoleMenu vehicleTypeMenu = new(
-            title: $"Choose vehicle for spot {spot}",
-            options:
-            [
-                new MenuOption(
-                "Car",
-                () => Park(vehicleCreator.CreateCar(), spot)),
+        VehicleCreatorResult result =
+            vehicleCreator.CreateVehicle();
 
-            new MenuOption(
-                "Motorcycle",
-                () => Park(vehicleCreator.CreateMotorcycle(), spot)),
+        if (!result.Success || result.Vehicle is null)
+        {
+            Console.WriteLine(result.Message);
+            ConsoleInput.Pause();
+            return;
+        }
 
-            new MenuOption(
-                "Airplane",
-                () => Park(vehicleCreator.CreateAirplane(), spot)),
-
-            new MenuOption(
-                "Bus",
-                () => Park(vehicleCreator.CreateBus(), spot)),
-
-            new MenuOption(
-                "Boat",
-                () => Park(vehicleCreator.CreateBoat(), spot)),
-
-            new MenuOption(
-                "Truck",
-                () => Park(vehicleCreator.CreateTruck(), spot))
-            ]);
-
-        vehicleTypeMenu.Show();
+        Console.WriteLine(result.Message);
+        Park(result.Vehicle, spot);
     }
 
     public void ListParkedVehicles()
@@ -161,7 +125,9 @@ public sealed class GarageActions
         }
         else
         {
-            PrintVehicle(match.Value.SpotIndex + 1, match.Value.Vehicle);  
+            VehicleActions.PrintVehicle(
+                match.Value.SpotIndex + 1,
+                match.Value.Vehicle);
         }
 
         ConsoleInput.Pause();
@@ -264,7 +230,7 @@ public sealed class GarageActions
 
             if (parkedVehicle is not null)
             {
-                PrintVehicle(
+                VehicleActions.PrintVehicle(
                     parkedVehicle.Value.SpotIndex + 1,
                     vehicle);
             }
@@ -291,18 +257,4 @@ public sealed class GarageActions
         ConsoleInput.Pause();
     }
 
-    private static void PrintVehicle(
-        int spotNumber,
-        Vehicle vehicle)
-    {
-        Console.WriteLine($"Spot: {spotNumber}");
-        Console.WriteLine($"Type: {vehicle.GetType().Name}");
-        Console.WriteLine(
-            $"Registration number: {vehicle.RegistrationNumber}");
-        Console.WriteLine(
-            $"Vehicle: {vehicle.Manufacturer} {vehicle.Model}");
-        Console.WriteLine($"Year: {vehicle.ManufacturingYear}");
-        Console.WriteLine($"Color: {vehicle.Color}");
-        Console.WriteLine();
-    }
 }
