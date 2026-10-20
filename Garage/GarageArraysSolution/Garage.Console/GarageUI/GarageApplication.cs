@@ -5,7 +5,7 @@ using VehicleGarage = Garage.Parking.Garage;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class GarageApplication
+internal sealed class GarageApplication
 {
     private VehicleGarage[] garages;
     private readonly CreatedVehicleStore createdVehicles;

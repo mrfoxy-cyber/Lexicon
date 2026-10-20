@@ -6,7 +6,7 @@ using Garage.Vehicles.Types;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class VehicleCreator
+internal sealed class VehicleCreator
 {
     private readonly CreatedVehicleStore createdVehicles;
     private readonly GarageProvider garageProvider;

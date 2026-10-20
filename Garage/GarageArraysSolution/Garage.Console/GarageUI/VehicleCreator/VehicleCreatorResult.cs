@@ -2,7 +2,7 @@ using Garage.Vehicles;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed record VehicleCreatorResult(
+internal sealed record VehicleCreatorResult(
     bool Success,
     bool Cancelled,
     Vehicle? Vehicle,

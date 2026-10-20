@@ -2,7 +2,7 @@ using Garage.Engines;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed record EngineCreatorResult(
+internal sealed record EngineCreatorResult(
     bool Success,
     bool Cancelled,
     Engine[] Engines,

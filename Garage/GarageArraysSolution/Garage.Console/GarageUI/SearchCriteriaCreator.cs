@@ -8,7 +8,7 @@ using Garage.Vehicles.Types;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class SearchCriteriaCreator
+internal sealed class SearchCriteriaCreator
 {
     private readonly Type[] availableVehicleTypes =
     [

@@ -1,6 +1,6 @@
 ﻿namespace Garage.ConsoleApp.GarageUI;
 
-public enum EngineKind
+internal enum EngineKind
 {
     Inline,
     VEngine,

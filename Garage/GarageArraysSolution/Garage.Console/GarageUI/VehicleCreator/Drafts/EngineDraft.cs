@@ -2,7 +2,7 @@ using Garage.Engines;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class EngineDraft
+internal sealed class EngineDraft
 {
     public EngineKind? Kind { get; set; }
     public string? SerialNumber { get; set; }

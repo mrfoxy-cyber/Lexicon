@@ -1,6 +1,6 @@
 ﻿namespace Garage.ConsoleApp.Logging;
 
-public static class ErrorLogger
+internal static class ErrorLogger
 {
     private const int LabelWidth = 20;
 

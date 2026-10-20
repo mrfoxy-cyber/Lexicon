@@ -2,7 +2,7 @@ using Garage.Vehicles;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class CreatedVehicleStore
+internal sealed class CreatedVehicleStore
 {
     private Vehicle[] vehicles;
 

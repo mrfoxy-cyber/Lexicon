@@ -2,7 +2,7 @@ using Garage.Vehicles.Types;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class CarDraft : VehicleDraft
+internal sealed class CarDraft : VehicleDraft
 {
     public string? Vin { get; set; }
     public BodyType? BodyType { get; set; }

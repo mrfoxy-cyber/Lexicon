@@ -8,7 +8,7 @@ using Garage.Factories;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class EngineActions
+internal sealed class EngineActions
 {
     public EngineCreatorResult CreateEngine(EngineDraft draft)
     {

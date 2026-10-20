@@ -2,7 +2,7 @@ using Garage.Vehicles.Types;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class BoatDraft : VehicleDraft
+internal sealed class BoatDraft : VehicleDraft
 {
     public string? Hin { get; set; }
     public double? DraftMeters { get; set; }

@@ -3,7 +3,7 @@ using VehicleGarage = Garage.Parking.Garage;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public static class VehicleParkingStatus
+internal static class VehicleParkingStatus
 {
     public static bool IsParked(
         Vehicle vehicle,

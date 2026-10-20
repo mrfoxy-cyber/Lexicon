@@ -1,6 +1,6 @@
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class AirplaneDraft : VehicleDraft
+internal sealed class AirplaneDraft : VehicleDraft
 {
     public double? WingspanMeters
     {

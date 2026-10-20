@@ -3,7 +3,7 @@ using Garage.Engines;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class EngineCreator
+internal sealed class EngineCreator
 {
     private readonly EngineActions engineActions = new();
     private readonly EngineDraft draft = new();

@@ -1,6 +1,6 @@
 namespace Garage.ConsoleApp.ConsoleFramework;
 
-public static class ConsoleInput
+internal static class ConsoleInput
 {
     public static int ReadInt(
         string prompt,

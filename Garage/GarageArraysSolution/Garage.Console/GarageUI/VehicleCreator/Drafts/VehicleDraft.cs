@@ -3,7 +3,7 @@ using Garage.Vehicles.Types;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public abstract class VehicleDraft
+internal abstract class VehicleDraft
 {
     public string? RegistrationNumber { get; set; }
     public string? Manufacturer { get; set; }

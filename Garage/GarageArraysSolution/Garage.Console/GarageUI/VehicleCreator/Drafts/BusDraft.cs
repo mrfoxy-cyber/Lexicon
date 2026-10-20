@@ -1,6 +1,6 @@
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class BusDraft : VehicleDraft
+internal sealed class BusDraft : VehicleDraft
 {
     public string? Vin { get; set; }
     public int? NumberOfDoors { get; set; }

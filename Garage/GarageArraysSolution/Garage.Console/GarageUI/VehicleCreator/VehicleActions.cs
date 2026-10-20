@@ -3,7 +3,7 @@ using Garage.Vehicles;
 
 namespace Garage.ConsoleApp.GarageUI;
 
-public sealed class VehicleActions
+internal sealed class VehicleActions
 {
     public Car CreateCar(CarDraft draft)
     {

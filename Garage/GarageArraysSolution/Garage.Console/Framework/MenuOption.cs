@@ -1,8 +1,8 @@
 ﻿namespace Garage.ConsoleApp.ConsoleFramework;
 
-public delegate string MenuTextProvider();
+internal delegate string MenuTextProvider();
 
-public sealed class MenuOption
+internal sealed class MenuOption
 {
     private readonly Action action;
     private readonly MenuTextProvider textProvider;

@@ -2,7 +2,7 @@
 
 namespace Garage.ConsoleApp.ConsoleFramework;
 
-public sealed class ConsoleMenu
+internal sealed class ConsoleMenu
 {
     private readonly MenuOption[] options;
 
