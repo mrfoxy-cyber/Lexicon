@@ -73,4 +73,30 @@ public class GarageParkingTests
         Assert.False(result.Success);
         Assert.Single(garage.Vehicles);
     }
+
+    [Fact]
+    public void Park_RejectsNullVehicle()
+    {
+        VehicleGarage garage = new("Test garage", 2);
+
+        Exception exception = Assert.Throws(
+            typeof(ArgumentNullException),
+            () => garage.Park(null!));
+
+        Assert.Contains("vehicle", exception.Message);
+        Assert.Empty(garage.Vehicles);
+    }
+
+    [Fact]
+    public void ParkAtSpot_RejectsNullVehicle()
+    {
+        VehicleGarage garage = new("Test garage", 2);
+
+        Exception exception = Assert.Throws(
+            typeof(ArgumentNullException),
+            () => garage.Park(null!, spot: 1));
+
+        Assert.Contains("vehicle", exception.Message);
+        Assert.Empty(garage.Vehicles);
+    }
 }

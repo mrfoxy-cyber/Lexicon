@@ -30,10 +30,12 @@ public static class SeedData
 
         JsonSerializerOptions options = new()
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow
         };
 
-        options.Converters.Add(new JsonStringEnumConverter());
+        options.Converters.Add(
+            new JsonStringEnumConverter(allowIntegerValues: false));
 
         string json = File.ReadAllText(filePath);
 
@@ -42,14 +44,23 @@ public static class SeedData
             (SeedVehicleDto[]?)JsonSerializer.Deserialize(
                 json,
                 typeof(SeedVehicleDto[]),
-                options) ?? [];
+                options) ?? throw new InvalidDataException(
+                    "The seed file must contain a JSON array of vehicles.");
 
         Vehicle[] vehicles =
     new Vehicle[seedVehicles.Length];
 
         for (int i = 0; i < seedVehicles.Length; i++)
         {
-            vehicles[i] = CreateVehicle(seedVehicles[i]);
+            SeedVehicleDto? seed = seedVehicles[i];
+
+            if (seed is null)
+            {
+                throw new InvalidDataException(
+                    $"Vehicle at position {i + 1} cannot be null.");
+            }
+
+            vehicles[i] = CreateVehicle(seed);
         }
 
         return vehicles;
@@ -57,7 +68,16 @@ public static class SeedData
 
     private static Vehicle CreateVehicle(SeedVehicleDto seed)
     {
-        return seed.Type.Trim().ToLowerInvariant() switch
+        string type = Require(seed.Type, seed, nameof(seed.Type));
+
+        Require(
+            seed.RegistrationNumber,
+            seed,
+            nameof(seed.RegistrationNumber));
+        Require(seed.Manufacturer, seed, nameof(seed.Manufacturer));
+        Require(seed.Model, seed, nameof(seed.Model));
+
+        return type.Trim().ToLowerInvariant() switch
         {
             "car" => CreateCar(seed),
             "motorcycle" => CreateMotorcycle(seed),
@@ -214,11 +234,27 @@ public static class SeedData
 
     private static Engine[] CreateEngines(SeedVehicleDto vehicle)
     {
+        if (vehicle.Engines is null)
+        {
+            throw MissingProperty(
+                vehicle,
+                nameof(vehicle.Engines));
+        }
+
         Engine[] engines = new Engine[vehicle.Engines.Length];
 
         for (int i = 0; i < vehicle.Engines.Length; i++)
         {
-            engines[i] = CreateEngine(vehicle.Engines[i]);
+            SeedEngineDto? seed = vehicle.Engines[i];
+
+            if (seed is null)
+            {
+                throw new InvalidDataException(
+                    $"Engine at position {i + 1} for vehicle " +
+                    $"'{vehicle.RegistrationNumber}' cannot be null.");
+            }
+
+            engines[i] = CreateEngine(seed);
         }
 
         return engines;
@@ -226,7 +262,12 @@ public static class SeedData
 
     private static Engine CreateEngine(SeedEngineDto seed)
     {
-        return seed.Type.Trim().ToLowerInvariant() switch
+        string type = Require(seed.Type, seed, nameof(seed.Type));
+
+        Require(seed.SerialNumber, seed, nameof(seed.SerialNumber));
+        Require(seed.Model, seed, nameof(seed.Model));
+
+        return type.Trim().ToLowerInvariant() switch
         {
             "inline" => EngineFactory.CreateInlineEngine(
                 seed.SerialNumber,
@@ -393,6 +434,21 @@ public static class SeedData
         return value ?? throw new InvalidDataException(
             $"Engine '{seed.SerialNumber}' of type " +
             $"'{seed.Type}' is missing '{propertyName}'.");
+    }
+
+    private static string Require(
+        string? value,
+        SeedEngineDto seed,
+        string propertyName)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            return value;
+        }
+
+        throw new InvalidDataException(
+            $"Engine '{seed.SerialNumber ?? "Unknown"}' of type " +
+            $"'{seed.Type ?? "Unknown"}' is missing '{propertyName}'.");
     }
 
     private static double Require(

@@ -91,6 +91,21 @@ public class Garage
         return false;
     }
 
+    private static void EnsureVehiclesAreNotNull(
+        Vehicle[] vehicles,
+        string parameterName)
+    {
+        for (int index = 0; index < vehicles.Length; index++)
+        {
+            if (vehicles[index] is null)
+            {
+                throw new ArgumentException(
+                    $"Vehicle at index {index} cannot be null.",
+                    parameterName);
+            }
+        }
+    }
+
     private bool RegistrationExists(
     string registrationNumber)
     {
@@ -237,7 +252,8 @@ public class Garage
         Vehicle[] vehicles)
         : this(
             garageName: garageName,
-            capacity: vehicles.Length,
+            capacity: vehicles?.Length ??
+                throw new ArgumentNullException(nameof(vehicles)),
             initialVehicles: vehicles)
     {
     }
@@ -273,6 +289,10 @@ public class Garage
                 nameof(initialVehicles));
         }
 
+        EnsureVehiclesAreNotNull(
+            startingVehicles,
+            nameof(initialVehicles));
+
         if (HasDuplicateRegistrations(startingVehicles))
         {
             throw new ArgumentException(
@@ -292,6 +312,8 @@ public class Garage
 
     public GarageOperationResult Park(Vehicle vehicle)
     {
+        ArgumentNullException.ThrowIfNull(vehicle);
+
         int availableSpotIndex = NextOpenSpace(vehicles);
 
         if (availableSpotIndex == -1)
@@ -307,6 +329,8 @@ public class Garage
 
     public GarageOperationResult Park(Vehicle vehicle, int spot)
     {
+        ArgumentNullException.ThrowIfNull(vehicle);
+
         if (spot > Capacity|| spot < 1)
             return new GarageOperationResult
                 (

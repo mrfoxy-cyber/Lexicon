@@ -44,4 +44,19 @@ public class GarageConstructionTests
                 capacity: 5,
                 initialVehicles: [first, second]));
     }
+
+    [Fact]
+    public void Constructor_RejectsNullVehicleInInitialArray()
+    {
+        Vehicle[] initialVehicles = [null!];
+
+        Exception exception = Assert.Throws(
+            typeof(ArgumentException),
+            () => new VehicleGarage(
+                "Test garage",
+                capacity: 5,
+                initialVehicles: initialVehicles));
+
+        Assert.Contains("cannot be null", exception.Message);
+    }
 }
