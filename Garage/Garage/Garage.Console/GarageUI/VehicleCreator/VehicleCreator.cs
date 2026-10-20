@@ -107,7 +107,7 @@ public sealed class VehicleCreator
                 IntOption("Wheels", () => busDraft.NumberOfWheels, value => busDraft.NumberOfWheels = value, 2, VehicleSpecification.MaximumNumberOfWheels),
                 IntOption("Passenger seats", () => busDraft.PassengerSeats, value => busDraft.PassengerSeats = value, 0, 500),
                 IntOption("Standing capacity", () => busDraft.StandingPassengerCapacity, value => busDraft.StandingPassengerCapacity = value, 0, 500),
-                IntOption("Driver seats", () => busDraft.DriverSeats, value => busDraft.DriverSeats = value, 1, 10)
+                IntOption("Driver seats", () => busDraft.DriverSeats, value => busDraft.DriverSeats = value, 0, 10)
             ],
             () => CreateVehicle(busDraft, vehicleActions.CreateBus));
     }

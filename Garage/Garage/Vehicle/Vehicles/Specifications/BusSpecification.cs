@@ -38,11 +38,18 @@ public class BusSpecification : VehicleSpecification
                 "Standing passenger capacity cannot be negative.");
         }
 
-        if (cabin.CrewSeatCount < 1)
+        if (cabin.PassengerSeatCount == 0 &&
+            standingPassengerCapacity == 0)
         {
             throw new ArgumentException(
-                "A bus must have at least one driver seat.",
-                nameof(cabin));
+                "A bus must have capacity for at least one passenger.");
+        }
+
+        if (cabin.CrewSeatCount < 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(cabin),
+                "Driver seat count cannot be negative.");
         }
 
         NumberOfDoors = numberOfDoors;
