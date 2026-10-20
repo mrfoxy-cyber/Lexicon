@@ -192,9 +192,9 @@
     "numberOfWheels": 3,
     "wingspanMeters": 11.0,
     "airframeSerialNumber": "CESSNA-AIR-007",
-    "passengerSeatCount": 3,
+    "passengerSeatCount": 2,
     "crewSeatCount": 0,
-    "pilotSeatCount": 1,
+    "pilotSeatCount": 2,
     "hasDualControls": true,
     "maximumAltitudeMeters": 4200,
     "engines": [

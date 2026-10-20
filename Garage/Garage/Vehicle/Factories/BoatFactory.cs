@@ -28,15 +28,6 @@ public static class BoatFactory
         int cabinCrewSeatCount,
         Engine[]? engines = null)
     {
-        if (hasCabin &&
-            cabinPassengerSeatCount > passengerCapacity)
-        {
-            throw new ArgumentException(
-                "Cabin passenger seats cannot exceed " +
-                "the boat's passenger capacity.",
-                nameof(cabinPassengerSeatCount));
-        }
-
         Cabin? cabin = hasCabin
             ? new Cabin
             {
@@ -53,15 +44,15 @@ public static class BoatFactory
             ManufacturingYear = manufacturingYear,
             Color = color,
             Hin = hin,
-            Specification = new BoatSpecification
+            Specification = new BoatSpecification(
+                passengerCapacity,
+                driverSeats,
+                cabin)
             {
                 WeightKg = weightKg,
                 Dimensions = new Dimensions(lengthMeters, widthMeters, heightMeters),
                 BoatType = boatType,
                 DraftMeters = draftMeters,
-                PassengerCapacity = passengerCapacity,
-                DriverSeats = driverSeats,
-                Cabin = cabin,
                 Engines = engines ?? []
             }
         };

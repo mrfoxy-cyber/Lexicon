@@ -34,18 +34,18 @@ public static class BusFactory
             ManufacturingYear = manufacturingYear,
             Color = color,
             Vin = vin,
-            Specification = new BusSpecification
-            {
-                WeightKg = weightKg,
-                Dimensions = new Dimensions(lengthMeters, widthMeters, heightMeters),
-                NumberOfDoors = numberOfDoors,
-                NumberOfWheels = numberOfWheels,
-                StandingPassengerCapacity = standingPassengerCapacity,
-                Cabin = new Cabin
+            Specification = new BusSpecification(
+                numberOfDoors,
+                numberOfWheels,
+                standingPassengerCapacity,
+                new Cabin
                 {
                     PassengerSeatCount = passengerSeatCount,
                     CrewSeatCount = driverSeatCount
-                },
+                })
+            {
+                WeightKg = weightKg,
+                Dimensions = new Dimensions(lengthMeters, widthMeters, heightMeters),
                 Engines = engines ?? []
             }
         };

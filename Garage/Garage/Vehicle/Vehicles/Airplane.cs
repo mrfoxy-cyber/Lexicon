@@ -14,11 +14,12 @@ namespace Garage.Vehicles
 
         public int PassengerCapacity => Specification.Cabin.PassengerSeatCount;
 
-        public int DriverSeats => Specification.Cabin.CrewSeatCount;
+        public int DriverSeats =>
+            Specification.Cockpit?.PilotSeats ?? 0;
 
         public int NumberOfSeats =>
             PassengerCapacity +
             DriverSeats +
-            (Specification.Cockpit?.PilotSeats ?? 0);
+            Specification.Cabin.CrewSeatCount;
     }
 }

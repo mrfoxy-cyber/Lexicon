@@ -33,7 +33,10 @@ public static class TruckFactory
             Color = color,
             Vin = vin,
 
-            Specification = new TruckSpecification
+            Specification = new TruckSpecification(
+                numberOfWheels,
+                numberOfAxles,
+                maximumLoadKg)
             {
                 WeightKg = weightKg,
 
@@ -42,9 +45,6 @@ public static class TruckFactory
                     widthMeters,
                     heightMeters),
 
-                NumberOfWheels = numberOfWheels,
-                NumberOfAxles = numberOfAxles,
-                MaximumLoadKg = maximumLoadKg,
                 Engines = engines ?? []
             }
         };

@@ -27,7 +27,8 @@ public static class AirplaneFactory
         double maximumAltitudeMeters,
         Engine[]? engines = null)
     {
-        Cockpit? cockpit = pilotSeatCount > 0
+        Cockpit? cockpit =
+            pilotSeatCount > 0 || hasDualControls
             ? new Cockpit
             {
                 PilotSeats = pilotSeatCount,
@@ -43,19 +44,19 @@ public static class AirplaneFactory
             ManufacturingYear = manufacturingYear,
             Color = color,
             AirframeSerialNumber = airframeSerialNumber,
-            Specification = new AirplaneSpecification
+            Specification = new AirplaneSpecification(
+                new Cabin
+                {
+                    PassengerSeatCount = passengerSeatCount,
+                    CrewSeatCount = crewSeatCount
+                },
+                cockpit)
             {
                 WeightKg = weightKg,
                 Dimensions = new Dimensions(lengthMeters, wingspanMeters, heightMeters),
                 NumberOfWheels = numberOfWheels,
                 WingspanMeters = wingspanMeters,
                 MaximumAltitudeMeters = maximumAltitudeMeters,
-                Cockpit = cockpit,
-                Cabin = new Cabin
-                {
-                    PassengerSeatCount = passengerSeatCount,
-                    CrewSeatCount = crewSeatCount
-                },
                 Engines = engines ?? []
             }
         };
