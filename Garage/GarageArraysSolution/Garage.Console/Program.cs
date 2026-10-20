@@ -1,0 +1,45 @@
+using Garage.ConsoleApp.Data;
+using Garage.ConsoleApp.GarageUI;
+using Garage.ConsoleApp.Logging;
+using Garage.Vehicles;
+using VehicleGarage = Garage.Parking.Garage;
+
+try
+{
+    Vehicle[] parkedVehicles =
+        SeedData.LoadVehicles("vehicles.json");
+
+    Vehicle[] createdVehicles =
+        SeedData.LoadVehicles("created-vehicles.json");
+
+    VehicleGarage startingGarage = new(
+       garageName: "Lexicon Garage",
+       capacity: 100,
+        initialVehicles: parkedVehicles);
+
+    GarageApplication application = new(
+        initialGarages: [startingGarage],
+        initialCreatedVehicles: createdVehicles);
+
+
+    application.Run();
+
+    Console.WriteLine("Goodbye!");
+}
+catch (Exception exception) when (
+    exception is IOException or
+    System.Text.Json.JsonException or
+    ArgumentException)
+{
+    Console.WriteLine(
+        $"The garage could not be started: {exception.Message}");
+}
+catch (Exception exception)
+{
+    ErrorLogger.TryLog(exception);
+
+    Console.WriteLine(
+        "An unexpected error occurred.");
+
+    Environment.ExitCode = 1;
+}
