@@ -13,7 +13,18 @@
     "vin": "VOLVO-V70-001",
     "bodyType": "Sedan",
     "numberOfDoors": 5,
-    "numberOfSeats": 5
+    "numberOfSeats": 5,
+    "engines": [
+      {
+        "type": "Inline",
+        "serialNumber": "ENG-VOLVO-001",
+        "model": "B4204T",
+        "fuelType": "Gasoline",
+        "horsePower": 190,
+        "displacementCc": 1969,
+        "cylinderCount": 4
+      }
+    ]
   },
   {
     "type": "Car",
@@ -29,7 +40,18 @@
     "vin": "SAAB-93-002",
     "bodyType": "Sedan",
     "numberOfDoors": 4,
-    "numberOfSeats": 5
+    "numberOfSeats": 5,
+    "engines": [
+      {
+        "type": "Inline",
+        "serialNumber": "ENG-SAAB-002",
+        "model": "B207R",
+        "fuelType": "Gasoline",
+        "horsePower": 210,
+        "displacementCc": 1998,
+        "cylinderCount": 4
+      }
+    ]
   },
   {
     "type": "Motorcycle",
@@ -47,7 +69,18 @@
     "hasSidecar": false,
     "numberOfWheels": 3,
     "passengerCapacity": 1,
-    "driverSeats": 1
+    "driverSeats": 1,
+    "engines": [
+      {
+        "type": "Flat",
+        "serialNumber": "ENG-HONDA-003",
+        "model": "Gold Wing Six",
+        "fuelType": "Gasoline",
+        "horsePower": 126,
+        "displacementCc": 1833,
+        "cylinderCount": 6
+      }
+    ]
   },
   {
     "type": "Bus",
@@ -65,7 +98,18 @@
     "numberOfWheels": 6,
     "passengerSeatCount": 40,
     "standingPassengerCapacity": 30,
-    "driverSeatCount": 1
+    "driverSeatCount": 1,
+    "engines": [
+      {
+        "type": "Inline",
+        "serialNumber": "ENG-SCANIA-004",
+        "model": "DC09",
+        "fuelType": "Diesel",
+        "horsePower": 360,
+        "displacementCc": 9290,
+        "cylinderCount": 5
+      }
+    ]
   },
   {
     "type": "Truck",
@@ -81,7 +125,18 @@
     "vin": "VOLVO-TRUCK-005",
     "numberOfWheels": 6,
     "numberOfAxles": 3,
-    "maximumLoadKg": 25000
+    "maximumLoadKg": 25000,
+    "engines": [
+      {
+        "type": "Inline",
+        "serialNumber": "ENG-TRUCK-005",
+        "model": "D16K",
+        "fuelType": "Diesel",
+        "horsePower": 750,
+        "displacementCc": 16123,
+        "cylinderCount": 6
+      }
+    ]
   },
   {
     "type": "Boat",
@@ -101,7 +156,27 @@
     "driverSeats": 1,
     "hasCabin": true,
     "cabinPassengerSeatCount": 4,
-    "cabinCrewSeatCount": 1
+    "cabinCrewSeatCount": 1,
+    "engines": [
+      {
+        "type": "Inline",
+        "serialNumber": "ENG-NIMBUS-006-A",
+        "model": "D4-320",
+        "fuelType": "Diesel",
+        "horsePower": 320,
+        "displacementCc": 3700,
+        "cylinderCount": 4
+      },
+      {
+        "type": "Inline",
+        "serialNumber": "ENG-NIMBUS-006-B",
+        "model": "D4-320",
+        "fuelType": "Diesel",
+        "horsePower": 320,
+        "displacementCc": 3700,
+        "cylinderCount": 4
+      }
+    ]
   },
   {
     "type": "Airplane",
@@ -121,6 +196,17 @@
     "crewSeatCount": 0,
     "pilotSeatCount": 1,
     "hasDualControls": true,
-    "maximumAltitudeMeters": 4200
+    "maximumAltitudeMeters": 4200,
+    "engines": [
+      {
+        "type": "Flat",
+        "serialNumber": "ENG-CESSNA-007",
+        "model": "IO-360-L2A",
+        "fuelType": "AviationGasoline",
+        "horsePower": 180,
+        "displacementCc": 5916,
+        "cylinderCount": 4
+      }
+    ]
   }
 ]

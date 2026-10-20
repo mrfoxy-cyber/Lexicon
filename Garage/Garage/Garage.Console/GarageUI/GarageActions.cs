@@ -9,11 +9,14 @@ namespace Garage.ConsoleApp.GarageUI;
 public sealed class GarageActions
 {
     private readonly VehicleGarage garage;
-    private readonly VehicleCreator vehicleCreator = new();
+    private readonly CreatedVehicleStore createdVehicles;
 
-    public GarageActions(VehicleGarage garage)
+    public GarageActions(
+        VehicleGarage garage,
+        CreatedVehicleStore createdVehicles)
     {
         this.garage = garage;
+        this.createdVehicles = createdVehicles;
     }
 
     public void ParkVehicle()
@@ -25,18 +28,10 @@ public sealed class GarageActions
             return;
         }
 
-        VehicleCreatorResult result =
-            vehicleCreator.CreateVehicle();
+        Vehicle? vehicle = SelectCreatedVehicle();
 
-        if (!result.Success || result.Vehicle is null)
-        {
-            Console.WriteLine(result.Message);
-            ConsoleInput.Pause();
-            return;
-        }
-
-        Console.WriteLine(result.Message);
-        Park(result.Vehicle);
+        if (vehicle is not null)
+            Park(vehicle);
     }
 
     public void ParkVehicleAtSpot()
@@ -53,18 +48,10 @@ public sealed class GarageActions
             minimum: 1,
             maximum: garage.Capacity);
 
-        VehicleCreatorResult result =
-            vehicleCreator.CreateVehicle();
+        Vehicle? vehicle = SelectCreatedVehicle();
 
-        if (!result.Success || result.Vehicle is null)
-        {
-            Console.WriteLine(result.Message);
-            ConsoleInput.Pause();
-            return;
-        }
-
-        Console.WriteLine(result.Message);
-        Park(result.Vehicle, spot);
+        if (vehicle is not null)
+            Park(vehicle, spot);
     }
 
     public void ListParkedVehicles()
@@ -243,6 +230,9 @@ public sealed class GarageActions
     {
         GarageOperationResult result = garage.Park(vehicle);
 
+        if (result.Success)
+            createdVehicles.Remove(vehicle);
+
         Console.WriteLine();
         Console.WriteLine(result.Message);
         ConsoleInput.Pause();
@@ -252,9 +242,44 @@ public sealed class GarageActions
     {
         GarageOperationResult result = garage.Park(vehicle, spot);
 
+        if (result.Success)
+            createdVehicles.Remove(vehicle);
+
         Console.WriteLine();
         Console.WriteLine(result.Message);
         ConsoleInput.Pause();
+    }
+
+    private Vehicle? SelectCreatedVehicle()
+    {
+        Vehicle[] vehicles = createdVehicles.Vehicles;
+
+        if (vehicles.Length == 0)
+        {
+            Console.WriteLine(
+                "There are no created vehicles available to park.");
+            ConsoleInput.Pause();
+            return null;
+        }
+
+        Console.WriteLine("Choose a created vehicle:");
+        Console.WriteLine("0. Cancel");
+
+        for (int index = 0; index < vehicles.Length; index++)
+        {
+            Vehicle vehicle = vehicles[index];
+            Console.WriteLine(
+                $"{index + 1}. {vehicle.GetType().Name}, " +
+                $"{vehicle.Manufacturer} {vehicle.Model}, " +
+                $"{vehicle.RegistrationNumber}");
+        }
+
+        int choice = ConsoleInput.ReadInt(
+            "Choose: ", 0, vehicles.Length);
+
+        return choice == 0
+            ? null
+            : vehicles[choice - 1];
     }
 
 }

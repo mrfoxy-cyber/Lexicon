@@ -8,14 +8,20 @@ namespace Garage.ConsoleApp.GarageUI;
 public sealed class GarageApplication
 {
     private VehicleGarage[] garages;
+    private readonly CreatedVehicleStore createdVehicles;
+    private readonly VehicleCreator vehicleCreator;
 
     public VehicleGarage[] Garages =>
         [.. garages];
 
     public GarageApplication(
-        VehicleGarage[] initialGarages)
+        VehicleGarage[] initialGarages,
+        Vehicle[]? initialCreatedVehicles = null)
     {
         garages = [.. initialGarages];
+        createdVehicles = new CreatedVehicleStore(
+            initialCreatedVehicles);
+        vehicleCreator = new VehicleCreator(createdVehicles);
     }
 
     private void AddGarage(
@@ -30,6 +36,10 @@ public sealed class GarageApplication
             title: "Garage system",
             options:
             [
+                new MenuOption(
+                    "Create and list vehicles",
+                    vehicleCreator.ShowMenu),
+
                 new MenuOption(
                     "Choose garage",
                     ChooseGarage),
@@ -114,20 +124,20 @@ public sealed class GarageApplication
         OpenGarage(garage);
     }
 
-    private static void OpenGarage(VehicleGarage garage)
+    private void OpenGarage(VehicleGarage garage)
     {
-        GarageActions actions = new(garage);
+        GarageActions actions = new(garage, createdVehicles);
 
         ConsoleMenu vehicleMenu = new(
             title: garage.GarageName,
             options:
             [
                 new MenuOption(
-                    "Park vehicle",
+                    "Park a created vehicle",
                     actions.ParkVehicle),
 
                 new MenuOption(
-                    "Park vehicle to specific spot",
+                    "Park a created vehicle to a specific spot",
                     actions.ParkVehicleAtSpot),
 
                 new MenuOption(
@@ -150,7 +160,7 @@ public sealed class GarageApplication
                     "Remove vehicle",
                     actions.RemoveVehicle)
             ],
-            backOptionText: "Choose another garage");
+            backOptionText: "Back");
 
         vehicleMenu.Show();
     }

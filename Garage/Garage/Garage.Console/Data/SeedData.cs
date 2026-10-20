@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Garage.Engines;
 using Garage.Factories;
 using Garage.Vehicles;
 
@@ -9,11 +10,15 @@ public static class SeedData
 {
     public static Vehicle[] LoadVehicles(string? filePath = null)
     {
-        // same as if (filePath is null)
-        filePath ??= Path.Combine(
-            AppContext.BaseDirectory,
-            "Data",
-            "vehicles.json");
+        filePath ??= "vehicles.json";
+
+        if (!Path.IsPathRooted(filePath))
+        {
+            filePath = Path.Combine(
+                AppContext.BaseDirectory,
+                "Data",
+                filePath);
+        }
 
         if (!File.Exists(filePath))
         {
@@ -80,7 +85,8 @@ public static class SeedData
             Require(seed.Vin, seed, nameof(seed.Vin)),
             Require(seed.BodyType, seed, nameof(seed.BodyType)),
             Require(seed.NumberOfDoors, seed, nameof(seed.NumberOfDoors)),
-            Require(seed.NumberOfSeats, seed, nameof(seed.NumberOfSeats)));
+            Require(seed.NumberOfSeats, seed, nameof(seed.NumberOfSeats)),
+            CreateEngines(seed));
     }
 
     private static Motorcycle CreateMotorcycle(SeedVehicleDto seed)
@@ -100,7 +106,8 @@ public static class SeedData
             Require(seed.HasSidecar, seed, nameof(seed.HasSidecar)),
             Require(seed.NumberOfWheels, seed, nameof(seed.NumberOfWheels)),
             Require(seed.PassengerCapacity, seed, nameof(seed.PassengerCapacity)),
-            Require(seed.DriverSeats, seed, nameof(seed.DriverSeats)));
+            Require(seed.DriverSeats, seed, nameof(seed.DriverSeats)),
+            CreateEngines(seed));
     }
 
     private static Bus CreateBus(SeedVehicleDto seed)
@@ -123,7 +130,8 @@ public static class SeedData
                 seed.StandingPassengerCapacity,
                 seed,
                 nameof(seed.StandingPassengerCapacity)),
-            Require(seed.DriverSeatCount, seed, nameof(seed.DriverSeatCount)));
+            Require(seed.DriverSeatCount, seed, nameof(seed.DriverSeatCount)),
+            CreateEngines(seed));
     }
 
     private static Truck CreateTruck(SeedVehicleDto seed)
@@ -141,7 +149,8 @@ public static class SeedData
             Require(seed.Vin, seed, nameof(seed.Vin)),
             Require(seed.NumberOfWheels, seed, nameof(seed.NumberOfWheels)),
             Require(seed.NumberOfAxles, seed, nameof(seed.NumberOfAxles)),
-            Require(seed.MaximumLoadKg, seed, nameof(seed.MaximumLoadKg)));
+            Require(seed.MaximumLoadKg, seed, nameof(seed.MaximumLoadKg)),
+            CreateEngines(seed));
     }
 
     private static Boat CreateBoat(SeedVehicleDto seed)
@@ -169,7 +178,8 @@ public static class SeedData
             Require(
                 seed.CabinCrewSeatCount,
                 seed,
-                nameof(seed.CabinCrewSeatCount)));
+                nameof(seed.CabinCrewSeatCount)),
+            CreateEngines(seed));
     }
 
     private static Airplane CreateAirplane(SeedVehicleDto seed)
@@ -196,7 +206,111 @@ public static class SeedData
             Require(
                 seed.MaximumAltitudeMeters,
                 seed,
-                nameof(seed.MaximumAltitudeMeters)));
+                nameof(seed.MaximumAltitudeMeters)),
+            CreateEngines(seed));
+    }
+
+    private static Engine[] CreateEngines(SeedVehicleDto vehicle)
+    {
+        Engine[] engines = new Engine[vehicle.Engines.Length];
+
+        for (int i = 0; i < vehicle.Engines.Length; i++)
+        {
+            engines[i] = CreateEngine(vehicle.Engines[i]);
+        }
+
+        return engines;
+    }
+
+    private static Engine CreateEngine(SeedEngineDto seed)
+    {
+        return seed.Type.Trim().ToLowerInvariant() switch
+        {
+            "inline" => EngineFactory.CreateInlineEngine(
+                seed.SerialNumber,
+                seed.Model,
+                Require(seed.FuelType, seed, nameof(seed.FuelType)),
+                Require(seed.HorsePower, seed, nameof(seed.HorsePower)),
+                Require(seed.DisplacementCc, seed, nameof(seed.DisplacementCc)),
+                Require(seed.CylinderCount, seed, nameof(seed.CylinderCount))),
+
+            "vengine" => EngineFactory.CreateVEngine(
+                seed.SerialNumber,
+                seed.Model,
+                Require(seed.FuelType, seed, nameof(seed.FuelType)),
+                Require(seed.HorsePower, seed, nameof(seed.HorsePower)),
+                Require(seed.DisplacementCc, seed, nameof(seed.DisplacementCc)),
+                Require(seed.CylinderCount, seed, nameof(seed.CylinderCount))),
+
+            "flat" => EngineFactory.CreateFlatEngine(
+                seed.SerialNumber,
+                seed.Model,
+                Require(seed.FuelType, seed, nameof(seed.FuelType)),
+                Require(seed.HorsePower, seed, nameof(seed.HorsePower)),
+                Require(seed.DisplacementCc, seed, nameof(seed.DisplacementCc)),
+                Require(seed.CylinderCount, seed, nameof(seed.CylinderCount))),
+
+            "rotary" => EngineFactory.CreateRotaryEngine(
+                seed.SerialNumber,
+                seed.Model,
+                Require(seed.FuelType, seed, nameof(seed.FuelType)),
+                Require(seed.HorsePower, seed, nameof(seed.HorsePower)),
+                Require(seed.DisplacementCc, seed, nameof(seed.DisplacementCc)),
+                Require(seed.RotorCount, seed, nameof(seed.RotorCount))),
+
+            "electricmotor" => EngineFactory.CreateElectricMotor(
+                seed.SerialNumber,
+                seed.Model,
+                Require(seed.PowerKw, seed, nameof(seed.PowerKw)),
+                Require(seed.Voltage, seed, nameof(seed.Voltage))),
+
+            "steam" => EngineFactory.CreateSteamEngine(
+                seed.SerialNumber,
+                seed.Model,
+                Require(seed.FuelType, seed, nameof(seed.FuelType)),
+                Require(seed.HorsePower, seed, nameof(seed.HorsePower)),
+                Require(
+                    seed.BoilerPressureBar,
+                    seed,
+                    nameof(seed.BoilerPressureBar))),
+
+            "turbojet" => EngineFactory.CreateTurbojetEngine(
+                seed.SerialNumber,
+                seed.Model,
+                Require(seed.FuelType, seed, nameof(seed.FuelType)),
+                Require(seed.ThrustKn, seed, nameof(seed.ThrustKn))),
+
+            "turbofan" => EngineFactory.CreateTurbofanEngine(
+                seed.SerialNumber,
+                seed.Model,
+                Require(seed.FuelType, seed, nameof(seed.FuelType)),
+                Require(seed.ThrustKn, seed, nameof(seed.ThrustKn)),
+                Require(seed.BypassRatio, seed, nameof(seed.BypassRatio))),
+
+            "turboprop" => EngineFactory.CreateTurbopropEngine(
+                seed.SerialNumber,
+                seed.Model,
+                Require(seed.FuelType, seed, nameof(seed.FuelType)),
+                Require(seed.ThrustKn, seed, nameof(seed.ThrustKn)),
+                Require(
+                    seed.ShaftHorsePower,
+                    seed,
+                    nameof(seed.ShaftHorsePower))),
+
+            "turboshaft" => EngineFactory.CreateTurboshaftEngine(
+                seed.SerialNumber,
+                seed.Model,
+                Require(seed.FuelType, seed, nameof(seed.FuelType)),
+                Require(seed.ThrustKn, seed, nameof(seed.ThrustKn)),
+                Require(
+                    seed.ShaftHorsePower,
+                    seed,
+                    nameof(seed.ShaftHorsePower))),
+
+            _ => throw new InvalidDataException(
+                $"Unknown engine type '{seed.Type}' for " +
+                $"serial number '{seed.SerialNumber}'.")
+        };
     }
 
     private static string Require(
@@ -227,6 +341,17 @@ public static class SeedData
     {
         return new InvalidDataException(
             $"Vehicle '{seed.RegistrationNumber}' of type " +
+            $"'{seed.Type}' is missing '{propertyName}'.");
+    }
+
+    private static TValue Require<TValue>(
+        TValue? value,
+        SeedEngineDto seed,
+        string propertyName)
+        where TValue : struct
+    {
+        return value ?? throw new InvalidDataException(
+            $"Engine '{seed.SerialNumber}' of type " +
             $"'{seed.Type}' is missing '{propertyName}'.");
     }
 }

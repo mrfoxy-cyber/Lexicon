@@ -1,0 +1,88 @@
+[
+  {
+    "type": "Car",
+    "registrationNumber": "NEW101",
+    "manufacturer": "Volvo",
+    "model": "XC60",
+    "manufacturingYear": 2024,
+    "color": "Blue",
+    "weightKg": 1900,
+    "lengthMeters": 4.7,
+    "widthMeters": 1.9,
+    "heightMeters": 1.65,
+    "vin": "VOLVO-XC60-TEST-101",
+    "bodyType": "SUV",
+    "numberOfDoors": 5,
+    "numberOfSeats": 5,
+    "engines": [
+      {
+        "type": "Inline",
+        "serialNumber": "AVAILABLE-ENG-101",
+        "model": "B4204T",
+        "fuelType": "Gasoline",
+        "horsePower": 250,
+        "displacementCc": 1969,
+        "cylinderCount": 4
+      }
+    ]
+  },
+  {
+    "type": "Car",
+    "registrationNumber": "NEW202",
+    "manufacturer": "Tesla",
+    "model": "Model 3",
+    "manufacturingYear": 2025,
+    "color": "White",
+    "weightKg": 1765,
+    "lengthMeters": 4.72,
+    "widthMeters": 1.85,
+    "heightMeters": 1.44,
+    "vin": "TESLA-MODEL3-TEST-202",
+    "bodyType": "Sedan",
+    "numberOfDoors": 4,
+    "numberOfSeats": 5,
+    "engines": [
+      {
+        "type": "ElectricMotor",
+        "serialNumber": "AVAILABLE-ENG-202",
+        "model": "Permanent Magnet Motor",
+        "powerKw": 208,
+        "voltage": 400
+      }
+    ]
+  },
+  {
+    "type": "Car",
+    "registrationNumber": "HYB303",
+    "manufacturer": "Toyota",
+    "model": "Prius",
+    "manufacturingYear": 2023,
+    "color": "Silver",
+    "weightKg": 1545,
+    "lengthMeters": 4.6,
+    "widthMeters": 1.78,
+    "heightMeters": 1.43,
+    "vin": "TOYOTA-PRIUS-TEST-303",
+    "bodyType": "Hatchback",
+    "numberOfDoors": 5,
+    "numberOfSeats": 5,
+    "engines": [
+      {
+        "type": "Inline",
+        "serialNumber": "AVAILABLE-ENG-303-A",
+        "model": "M20A-FXS",
+        "fuelType": "Gasoline",
+        "horsePower": 150,
+        "displacementCc": 1987,
+        "cylinderCount": 4
+      },
+      {
+        "type": "ElectricMotor",
+        "serialNumber": "AVAILABLE-ENG-303-B",
+        "model": "Toyota Hybrid Motor",
+        "powerKw": 83,
+        "voltage": 600
+      }
+    ]
+  }
+]

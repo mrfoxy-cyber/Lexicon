@@ -6,16 +6,20 @@ using VehicleGarage =
 
 try
 {
-    Vehicle[] startingVehicles =
-        SeedData.LoadVehicles();
+    Vehicle[] parkedVehicles =
+        SeedData.LoadVehicles("vehicles.json");
+
+    Vehicle[] createdVehicles =
+        SeedData.LoadVehicles("created-vehicles.json");
 
     VehicleGarage startingGarage = new(
        garageName: "Lexicon Garage",
        capacity: 20,
-        initialVehicles: startingVehicles);
+        initialVehicles: parkedVehicles);
 
     GarageApplication application = new(
-        initialGarages: [startingGarage]);
+        initialGarages: [startingGarage],
+        initialCreatedVehicles: createdVehicles);
 
     application.Run();
 

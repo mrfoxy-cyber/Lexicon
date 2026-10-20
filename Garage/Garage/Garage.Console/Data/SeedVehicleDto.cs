@@ -14,6 +14,7 @@ internal sealed class SeedVehicleDto
     public required double LengthMeters { get; init; }
     public required double WidthMeters { get; init; }
     public required double HeightMeters { get; init; }
+    public SeedEngineDto[] Engines { get; init; } = [];
 
     public string? Vin { get; init; }
     public string? Hin { get; init; }
